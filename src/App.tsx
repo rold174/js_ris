@@ -1,26 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import Canvas from "./components/Canvas/Canvas";
+import Toolbar from "./components/Canvas/Toolbar";
 
-function App() {
+export default function App() {
+  const [color, setColor] = React.useState("black");
+  const [tool, setTool] = React.useState("brush");
+  const [lineWidth, setLineWidth] = React.useState(4);
+
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="w-screen h-screen flex flex-col bg-gray-100">
+      <Toolbar
+        color={color}
+        setColor={setColor}
+        tool={tool}
+        setTool={setTool}
+        lineWidth={lineWidth}
+        setLineWidth={setLineWidth}
+      />
+
+      <Canvas
+        ref={canvasRef}
+        color={color}
+        tool={tool}
+        lineWidth={lineWidth}
+      />
     </div>
   );
 }
-
-export default App;

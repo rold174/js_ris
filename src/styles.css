@@ -1,0 +1,135 @@
+/* ===== GLOBAL ===== */
+body {
+  margin: 0;
+  padding: 0;
+  background: #f0f0f0;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* LEFT PANEL */
+.tools-panel {
+  width: 200px;
+  background: #e5e5e5;
+  padding: 10px;
+  border-right: 1px solid #c1c1c1;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* RIGHT PANEL */
+.layers-panel {
+  width: 250px;
+  background: #e5e5e5;
+  padding: 10px;
+  border-left: 1px solid #c1c1c1;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* CENTER: CANVAS AREA */
+.canvas-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: #d9d9d9;
+}
+
+/* ================== CANVAS ================== */
+
+.canvas-wrapper {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  background: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+/* BASE LAYER (all saved strokes) */
+.canvas-base {
+  position: relative;
+  left: 0; 
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+}
+
+/* LIVE LAYER (active drawing) */
+.canvas-live {
+  position: relative;
+  left: 0; 
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+
+  /* ВАЖНО: принимаем события */
+  pointer-events: auto;
+}
+
+/* DO NOT TOUCH CANVAS SIZE! */
+canvas {
+  display: block;
+}
+
+/* ====== TOOLS ====== */
+
+.tool-btn {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 6px;
+  background: white;
+  border: 1px solid #bcbcbc;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.tool-btn.active {
+  background: #cfe3ff;
+  border-color: #7fb1ff;
+}
+
+/* ====== LAYER PANEL ====== */
+
+.layer-item {
+  background: white;
+  padding: 8px;
+  border: 1px solid #bcbcbc;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.layer-item.active {
+  background: #d1e7ff;
+  border-color: #7fb1ff;
+}
+
+.layer-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.row-btns {
+  margin-top: 5px;
+  display: flex;
+  gap: 5px;
+}
+
+.row-btns button {
+  flex: 1;
+  background: #f2f2f2;
+  border: 1px solid #bbbbbb;
+  padding: 3px;
+  cursor: pointer;
+  border-radius: 4px;
+}
