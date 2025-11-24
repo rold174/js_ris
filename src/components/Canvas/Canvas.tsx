@@ -1,6 +1,12 @@
 import React from "react";
-import useDrawing from "./useDrawing";
 import useFill from "./useFill";
+import useHistory from "./useHistory";
+import "../styles/styles.css";
+
+export type CanvasHandle = {
+  undo: () => void;
+  redo: () => void;
+};
 
 type CanvasProps = {
   color: string;
@@ -8,48 +14,86 @@ type CanvasProps = {
   lineWidth: number;
 };
 
-const Canvas = React.forwardRef<HTMLCanvasElement, CanvasProps>(
+const Canvas = React.forwardRef<CanvasHandle, CanvasProps>(
   ({ color, tool, lineWidth }, ref) => {
-    const { handleStart, handleDraw, handleEnd } = useDrawing(
-      ref as React.RefObject<HTMLCanvasElement>,
-      color,
-      tool,
-      lineWidth
-    );
 
-    const fill = useFill(
-        ref as React.RefObject<HTMLCanvasElement>, 
-        color, 
-        tool
-    );
+    const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+    const isDrawing = React.useRef(false);
+    const ctxRef = React.useRef<CanvasRenderingContext2D | null>(null);
+
+    const { save, undo, redo } = useHistory(canvasRef);
+    const fill = useFill(canvasRef, color, tool);
+
+    React.useImperativeHandle(ref, () => ({
+      undo,
+      redo,
+    }));
+
+    React.useEffect(() => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const ctx = canvas.getContext("2d")!;
+      ctx.lineCap = "round";
+      ctxRef.current = ctx;
+
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      save();
+    }, []);
 
     const start = (e: React.MouseEvent) => {
       const { offsetX, offsetY } = e.nativeEvent;
 
+      save();
+
       if (tool === "fill") {
         fill(offsetX, offsetY);
+        save();
+        ctxRef.current?.beginPath();
         return;
       }
 
-      handleStart(offsetX, offsetY);
+      isDrawing.current = true;
+      ctxRef.current!.lineWidth = lineWidth;
+      ctxRef.current!.beginPath();
+      ctxRef.current!.moveTo(offsetX, offsetY);
     };
 
     const draw = (e: React.MouseEvent) => {
+      if (!isDrawing.current) return;
+
       const { offsetX, offsetY } = e.nativeEvent;
-      handleDraw(offsetX, offsetY);
+
+      ctxRef.current!.strokeStyle = tool === "eraser" ? "#ffffff" : color;
+      ctxRef.current!.lineWidth = lineWidth;
+      ctxRef.current!.lineTo(offsetX, offsetY);
+      ctxRef.current!.stroke();
+    };
+
+    const end = () => {
+      if (!isDrawing.current) return;
+
+      isDrawing.current = false;
+      ctxRef.current?.closePath();
     };
 
     return (
-      <canvas
-        ref={ref}
-        width={window.innerWidth}
-        height={window.innerHeight - 80}
-        className="bg-white border-t border-gray-300"
-        onMouseDown={start}
-        onMouseMove={draw}
-        onMouseUp={handleEnd}
-        onMouseLeave={handleEnd}
-      />
+      <div className="p-4 bg-[#c0c0c0] flex justify-center items-center">  
+        <div className="canvas-wrapper">
+          <canvas
+            ref={canvasRef}
+            width={window.innerWidth - 100}
+            height={window.innerHeight - 100}
+            className="bg-white"
+            onMouseDown={start}
+            onMouseMove={draw}
+            onMouseUp={end}
+            onMouseLeave={end}
+          />
+        </div>  
+    </div>
     );
   }
 );

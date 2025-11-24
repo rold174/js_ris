@@ -1,8 +1,7 @@
-import React from "react";
 import { getPixel, setPixel, colorsMatch, hexToRGBA } from "./utils";
 
 export default function useFill(
-  ref: React.RefObject<HTMLCanvasElement>,
+  ref: React.RefObject<HTMLCanvasElement | null>,
   color: string,
   tool: string
 ) {
@@ -14,10 +13,10 @@ export default function useFill(
     const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = img.data;
 
-    const targetColor = getPixel(data, x, y, canvas.width);
+    const target = getPixel(data, x, y, canvas.width);
     const fillColor = hexToRGBA(tool === "eraser" ? "#ffffff" : color);
 
-    if (colorsMatch(targetColor, fillColor)) return;
+    if (colorsMatch(target, fillColor)) return;
 
     const stack: [number, number][] = [[x, y]];
 
@@ -25,7 +24,7 @@ export default function useFill(
       const [cx, cy] = stack.pop()!;
       const current = getPixel(data, cx, cy, canvas.width);
 
-      if (!colorsMatch(current, targetColor)) continue;
+      if (!colorsMatch(current, target)) continue;
 
       setPixel(data, cx, cy, fillColor, canvas.width);
 

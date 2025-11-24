@@ -1,13 +1,13 @@
 import React from "react";
-import Canvas from "./components/Canvas/Canvas";
+import Canvas, { CanvasHandle } from "./components/Canvas/Canvas";
 import Toolbar from "./components/Canvas/Toolbar";
 
 export default function App() {
-  const [color, setColor] = React.useState("black");
-  const [tool, setTool] = React.useState("brush");
+  const [color, setColor] = React.useState("#000000");
+  const [tool, setTool] = React.useState<"brush" | "eraser" | "fill">("brush");
   const [lineWidth, setLineWidth] = React.useState(4);
 
-  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+  const canvasRef = React.useRef<CanvasHandle>(null);
 
   return (
     <div className="w-screen h-screen flex flex-col bg-gray-100">
@@ -15,9 +15,11 @@ export default function App() {
         color={color}
         setColor={setColor}
         tool={tool}
-        setTool={setTool}
+        setTool={(t) => setTool(t as any)}
         lineWidth={lineWidth}
         setLineWidth={setLineWidth}
+        undo={() => canvasRef.current?.undo()}
+        redo={() => canvasRef.current?.redo()}
       />
 
       <Canvas
