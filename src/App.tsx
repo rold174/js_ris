@@ -1,16 +1,46 @@
-import React from "react";
-import Canvas, { CanvasHandle } from "./components/Canvas/Canvas";
+import React, { useRef, useState } from "react";
+import Canvas from "./components/Canvas/Canvas";
 import Toolbar from "./components/Canvas/Toolbar";
 
 export default function App() {
-  const canvasRef = React.useRef<CanvasHandle>(null);
+  const [color, setColor] = useState("#000000");
+  const [tool, setTool] = useState<"brush" | "eraser" | "fill">("brush");
+  const [lineWidth, setLineWidth] = useState(5);
 
-  const [color, setColor] = React.useState("#000000");
-  const [tool, setTool] = React.useState<"brush" | "eraser">("brush");
-  const [lineWidth, setLineWidth] = React.useState(5);
+  const undoRef = useRef<() => void>(() => {});
+  const redoRef = useRef<() => void>(() => {});
+
+  const registerUndo = (cb: () => void) => {
+    undoRef.current = cb;
+  };
+
+  const registerRedo = (cb: () => void) => {
+    redoRef.current = cb;
+  };
+
+  const handleUndo = () => undoRef.current();
+  const handleRedo = () => redoRef.current();
+
+  // сохранение PNG
+  const handleSaveImage = () => {
+    const stage: any = document.querySelector("canvas")?.parentElement
+      ?.parentElement;
+
+    if (!stage) return;
+
+    const konvaStage = stage.__konvaNode;
+    if (!konvaStage) return;
+
+    const dataURL = konvaStage.toDataURL({ pixelRatio: 2 });
+
+    const link = document.createElement("a");
+    link.download = "drawing.png";
+    link.href = dataURL;
+    link.click();
+  };
 
   return (
-    <div className="w-full h-full overflow-hidden">
+    <div className="w-full h-full flex flex-col">
       <Toolbar
         color={color}
         setColor={setColor}
@@ -18,16 +48,19 @@ export default function App() {
         setTool={setTool}
         lineWidth={lineWidth}
         setLineWidth={setLineWidth}
-        undo={() => canvasRef.current?.undo()}
-        redo={() => canvasRef.current?.redo()}
-        saveImage={() => canvasRef.current?.saveImage()}
+        undo={handleUndo}
+        redo={handleRedo}
+        saveImage={handleSaveImage}
       />
 
       <Canvas
-        ref={canvasRef}
         color={color}
-        lineWidth={lineWidth}
         tool={tool}
+        lineWidth={lineWidth}
+        undo={handleUndo}
+        redo={handleRedo}
+        registerUndo={registerUndo}
+        registerRedo={registerRedo}
       />
     </div>
   );
