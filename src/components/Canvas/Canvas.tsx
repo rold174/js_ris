@@ -1,133 +1,159 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
 import './Canvas.css';
+import { ToolState } from '../App/App';
 
 interface CanvasProps {
-  currentTool: string;
-  brushSize: number;
-  brushColor: string;
+  isDrawing: boolean;
+  setIsDrawing: (drawing: boolean) => void;
+  toolState: ToolState;
+  saveToHistory: (canvasData: string) => void;
+  clearHistory: () => void;
 }
 
-const Canvas: React.FC<CanvasProps> = ({ currentTool, brushSize, brushColor }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [lastPosition, setLastPosition] = useState<{ x: number; y: number } | null>(null);
+const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({
+  isDrawing,
+  setIsDrawing,
+  toolState,
+  saveToHistory,
+  clearHistory
+}, ref) => {
+  const internalCanvasRef = useRef<HTMLCanvasElement>(null);
+  const lastPointRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Функция для получения координат мыши относительно canvas
-  const getMousePos = useCallback((e: MouseEvent) => {
-    const canvas = canvasRef.current;
+  useImperativeHandle(ref, () => internalCanvasRef.current!);
+
+  useEffect(() => {
+    const canvas = internalCanvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+  }, []);
+
+  const getCanvasPoint = (clientX: number, clientY: number) => {
+    const canvas = internalCanvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
 
     const rect = canvas.getBoundingClientRect();
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
+      x: clientX - rect.left,
+      y: clientY - rect.top
     };
-  }, []);
+  };
 
-  // Функция рисования
-  const draw = useCallback((currentPos: { x: number; y: number }) => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (!ctx || !lastPosition) return;
+  const startDrawing = (e: React.MouseEvent) => {
+    const point = getCanvasPoint(e.clientX, e.clientY);
+    lastPointRef.current = point;
+    setIsDrawing(true);
 
-    ctx.beginPath();
-    ctx.moveTo(lastPosition.x, lastPosition.y);
-    ctx.lineTo(currentPos.x, currentPos.y);
-    
-    if (currentTool === 'eraser') {
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = brushSize;
-    } else {
-      ctx.strokeStyle = brushColor;
-      ctx.lineWidth = brushSize;
+    if (toolState.tool === 'brush') {
+      draw(point);
     }
-    
+  };
+
+  const draw = (currentPoint: { x: number; y: number }) => {
+    const canvas = internalCanvasRef.current;
+    if (!canvas || !isDrawing) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.strokeStyle = toolState.color;
+    ctx.lineWidth = toolState.brushSize;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.stroke();
 
-    setLastPosition(currentPos);
-  }, [lastPosition, currentTool, brushSize, brushColor]);
+    if (lastPointRef.current) {
+      ctx.beginPath();
+      ctx.moveTo(lastPointRef.current.x, lastPointRef.current.y);
+      ctx.lineTo(currentPoint.x, currentPoint.y);
+      ctx.stroke();
+    }
 
-  // Обработчики событий мыши
-  const handleMouseDown = useCallback((e: MouseEvent) => {
-    setIsDrawing(true);
-    setLastPosition(getMousePos(e));
-  }, [getMousePos]);
+    lastPointRef.current = currentPoint;
+  };
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
+  const erase = (currentPoint: { x: number; y: number }) => {
+    const canvas = internalCanvasRef.current;
+    if (!canvas || !isDrawing) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = toolState.brushSize;
+    ctx.lineCap = 'round';
+
+    if (lastPointRef.current) {
+      ctx.beginPath();
+      ctx.moveTo(lastPointRef.current.x, lastPointRef.current.y);
+      ctx.lineTo(currentPoint.x, currentPoint.y);
+      ctx.stroke();
+    }
+
+    lastPointRef.current = currentPoint;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDrawing) return;
-    draw(getMousePos(e));
-  }, [isDrawing, draw, getMousePos]);
 
-  const handleMouseUp = useCallback(() => {
-    setIsDrawing(false);
-    setLastPosition(null);
-  }, []);
+    const point = getCanvasPoint(e.clientX, e.clientY);
 
-  // Инициализация canvas и подписка на события
-  useEffect(() => {
-    const canvas = canvasRef.current;
+    if (toolState.tool === 'brush') {
+      draw(point);
+    } else if (toolState.tool === 'eraser') {
+      erase(point);
+    }
+  };
+
+  const stopDrawing = () => {
+    if (isDrawing) {
+      setIsDrawing(false);
+      lastPointRef.current = null;
+
+      const canvas = internalCanvasRef.current;
+      if (canvas) {
+        saveToHistory(canvas.toDataURL());
+      }
+    }
+  };
+
+  const clearCanvas = () => {
+    const canvas = internalCanvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     if (ctx) {
-      // Начальная настройка контекста
-      ctx.strokeStyle = brushColor;
-      ctx.lineWidth = brushSize;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      saveToHistory(canvas.toDataURL());
+      clearHistory();
     }
-
-    // Подписка на события
-    canvas.addEventListener('mousedown', handleMouseDown);
-    canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('mouseup', handleMouseUp);
-    canvas.addEventListener('mouseout', handleMouseUp);
-
-    return () => {
-      canvas.removeEventListener('mousedown', handleMouseDown);
-      canvas.removeEventListener('mousemove', handleMouseMove);
-      canvas.removeEventListener('mouseup', handleMouseUp);
-      canvas.removeEventListener('mouseout', handleMouseUp);
-    };
-  }, [handleMouseDown, handleMouseMove, handleMouseUp, brushColor, brushSize]);
-
-  // Обработчик изменения размера окна
-  useEffect(() => {
-    const handleResize = () => {
-      if (canvasRef.current) {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        
-        // Сохраняем текущее изображение
-        const imageData = ctx?.getImageData(0, 0, canvas.width, canvas.height);
-        
-        // Меняем размер
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight - 60;
-        
-        // Восстанавливаем изображение
-        if (imageData && ctx) {
-          ctx.putImageData(imageData, 0, 0);
-        }
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  };
 
   return (
     <div className="canvas-container">
-      <canvas 
-        ref={canvasRef}
+      <canvas
+        ref={internalCanvasRef}
         id="main-canvas"
-        width={window.innerWidth}
-        height={window.innerHeight - 60}
+        width={800}
+        height={600}
+        onMouseDown={startDrawing}
+        onMouseMove={handleMouseMove}
+        onMouseUp={stopDrawing}
+        onMouseLeave={stopDrawing}
       />
+      <div className="canvas-controls">
+        <button onClick={clearCanvas} className="clear-btn">
+          Очистить холст
+        </button>
+      </div>
     </div>
   );
-};
+});
+
+Canvas.displayName = 'Canvas';
 
 export default Canvas;
