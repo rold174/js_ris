@@ -45,41 +45,50 @@ const Canvas = React.forwardRef<CanvasHandle, CanvasProps>(
       save();
     }, []);
 
-    const start = (e: React.MouseEvent) => {
-      const { offsetX, offsetY } = e.nativeEvent;
+const start = (e: React.PointerEvent) => {
+  const canvas = canvasRef.current;
+  if (!canvas) return;
 
-      save();
+  canvas.setPointerCapture(e.pointerId);
 
-      if (tool === "fill") {
-        fill(offsetX, offsetY);
-        save();
-        ctxRef.current?.beginPath();
-        return;
-      }
+  const { offsetX, offsetY } = e.nativeEvent;
 
-      isDrawing.current = true;
-      ctxRef.current!.lineWidth = lineWidth;
-      ctxRef.current!.beginPath();
-      ctxRef.current!.moveTo(offsetX, offsetY);
-    };
+  save();
 
-    const draw = (e: React.MouseEvent) => {
-      if (!isDrawing.current) return;
+  if (tool === "fill") {
+    fill(offsetX, offsetY);
+    save();
+    return;
+  }
 
-      const { offsetX, offsetY } = e.nativeEvent;
+  isDrawing.current = true;
+  ctxRef.current!.lineWidth = lineWidth;
+  ctxRef.current!.beginPath();
+  ctxRef.current!.moveTo(offsetX, offsetY);
+};
 
-      ctxRef.current!.strokeStyle = tool === "eraser" ? "#ffffff" : color;
-      ctxRef.current!.lineWidth = lineWidth;
-      ctxRef.current!.lineTo(offsetX, offsetY);
-      ctxRef.current!.stroke();
-    };
+const draw = (e: React.PointerEvent) => {
+  if (!isDrawing.current) return;
 
-    const end = () => {
-      if (!isDrawing.current) return;
+  const { offsetX, offsetY } = e.nativeEvent;
 
-      isDrawing.current = false;
-      ctxRef.current?.closePath();
-    };
+  ctxRef.current!.strokeStyle = tool === "eraser" ? "#ffffff" : color;
+  ctxRef.current!.lineWidth = lineWidth;
+  ctxRef.current!.lineTo(offsetX, offsetY);
+  ctxRef.current!.stroke();
+};
+
+const end = (e: React.PointerEvent) => {
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+
+  canvas.releasePointerCapture(e.pointerId);
+
+  if (!isDrawing.current) return;
+
+  isDrawing.current = false;
+  ctxRef.current?.closePath();
+};
 
     const saveImage = () => {
       const canvas = canvasRef.current;
@@ -99,10 +108,9 @@ const Canvas = React.forwardRef<CanvasHandle, CanvasProps>(
             width={window.innerWidth - 30}
             height={window.innerHeight - 100}
             className="bg-white"
-            onMouseDown={start}
-            onMouseMove={draw}
-            onMouseUp={end}
-            onMouseLeave={end}
+            onPointerDown={start}
+            onPointerMove={draw}
+            onPointerUp={end}
           />
         </div>  
     </div>
