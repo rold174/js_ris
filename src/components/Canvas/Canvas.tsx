@@ -235,7 +235,7 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({
       <canvas
         ref={internalCanvasRef}
         id="main-canvas"
-        width={800}
+        width={1600}
         height={600}
         onMouseDown={startDrawing}
         onMouseMove={handleMouseMove}
