@@ -1,0 +1,29 @@
+.start-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: #20232a;
+}
+
+.start-title {
+  font-size: 60px;
+  color: #61dafb;
+  margin-bottom: 40px;
+}
+
+.start-btn {
+  padding: 15px 40px;
+  font-size: 22px;
+  background: #61dafb;
+  border-radius: 12px;
+  color: #000;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.start-btn:hover {
+  transform: scale(1.1);
+  background: #3fa8d1;
+}
