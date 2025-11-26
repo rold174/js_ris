@@ -96,7 +96,7 @@ const Canvas = React.forwardRef<CanvasHandle, CanvasProps>(
         <div className="canvas-wrapper">
           <canvas
             ref={canvasRef}
-            width={window.innerWidth - 100}
+            width={window.innerWidth - 30}
             height={window.innerHeight - 100}
             className="bg-white"
             onMouseDown={start}
