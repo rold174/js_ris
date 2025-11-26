@@ -69,7 +69,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           <input
             type="range"
             min="1"
-            max="50"
+            max="300"
             value={toolState.brushSize}
             onChange={(e) => handleBrushSizeChange(Number(e.target.value))}
             disabled={toolState.tool === 'fill'}
