@@ -91,8 +91,8 @@ const Canvas = forwardRef<CanvasHandle, CanvasProps>(
       <div className="p-4 bg-[#c0c0c0] flex justify-center items-center">
         <div className="border-2 border-gray-600 shadow-xl bg-white">
           <Stage
-            width={window.innerWidth - 200}
-            height={window.innerHeight - 150}
+            width={1920 - 200}
+            height={1080 - 150}
             ref={stageRef}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
