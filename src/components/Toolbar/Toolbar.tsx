@@ -46,19 +46,19 @@ const Toolbar: React.FC<ToolbarProps> = ({
             className={`tool-btn ${toolState.tool === 'brush' ? 'active' : ''}`}
             onClick={() => handleToolChange('brush')}
           >
-            Кисть
+            🖌️
           </button>
           <button
             className={`tool-btn ${toolState.tool === 'eraser' ? 'active' : ''}`}
             onClick={() => handleToolChange('eraser')}
           >
-            Ластик
+            🧽
           </button>
           <button
             className={`tool-btn ${toolState.tool === 'fill' ? 'active' : ''}`}
             onClick={() => handleToolChange('fill')}
           >
-            Заливка
+            🧺
           </button>
         </div>
       </div>

@@ -248,7 +248,7 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({
       />
       <div className="canvas-controls">
         <button onClick={clearCanvas} className="clear-btn">
-          Очистить холст
+          🚮
         </button>
       </div>
     </div>
