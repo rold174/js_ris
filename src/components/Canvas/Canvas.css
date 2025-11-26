@@ -1,0 +1,11 @@
+.canvas-container {
+  flex: 1;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+#main-canvas {
+  display: block;
+  background-color: white;
+  cursor: crosshair;
+}

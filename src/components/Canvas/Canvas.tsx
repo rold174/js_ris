@@ -1,122 +1,46 @@
-import React from "react";
-import useFill from "./useFill";
-import useHistory from "./useHistory";
-import "../styles/styles.css";
+import React, { useEffect, useRef } from 'react';
+import './Canvas.css';
 
-export type CanvasHandle = {
-  undo: () => void;
-  redo: () => void;
-  saveImage: () => void;
-};
+const Canvas: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-type CanvasProps = {
-  color: string;
-  tool: string;
-  lineWidth: number;
-};
-
-const Canvas = React.forwardRef<CanvasHandle, CanvasProps>(
-  ({ color, tool, lineWidth }, ref) => {
-
-    const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
-    const isDrawing = React.useRef(false);
-    const ctxRef = React.useRef<CanvasRenderingContext2D | null>(null);
-
-    const { save, undo, redo } = useHistory(canvasRef);
-    const fill = useFill(canvasRef, color, tool);
-
-    React.useImperativeHandle(ref, () => ({
-      undo,
-      redo,
-      saveImage,
-    }));
-
-    React.useEffect(() => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const ctx = canvas.getContext("2d")!;
-      ctx.lineCap = "round";
-      ctxRef.current = ctx;
-
-      ctx.fillStyle = "white";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      save();
-    }, []);
-
-const start = (e: React.PointerEvent) => {
-  const canvas = canvasRef.current;
-  if (!canvas) return;
-
-  canvas.setPointerCapture(e.pointerId);
-
-  const { offsetX, offsetY } = e.nativeEvent;
-
-  save();
-
-  if (tool === "fill") {
-    fill(offsetX, offsetY);
-    save();
-    return;
-  }
-
-  isDrawing.current = true;
-  ctxRef.current!.lineWidth = lineWidth;
-  ctxRef.current!.beginPath();
-  ctxRef.current!.moveTo(offsetX, offsetY);
-};
-
-const draw = (e: React.PointerEvent) => {
-  if (!isDrawing.current) return;
-
-  const { offsetX, offsetY } = e.nativeEvent;
-
-  ctxRef.current!.strokeStyle = tool === "eraser" ? "#ffffff" : color;
-  ctxRef.current!.lineWidth = lineWidth;
-  ctxRef.current!.lineTo(offsetX, offsetY);
-  ctxRef.current!.stroke();
-};
-
-const end = (e: React.PointerEvent) => {
-  const canvas = canvasRef.current;
-  if (!canvas) return;
-
-  canvas.releasePointerCapture(e.pointerId);
-
-  if (!isDrawing.current) return;
-
-  isDrawing.current = false;
-  ctxRef.current?.closePath();
-  save();
-};
-
-    const saveImage = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const link = document.createElement("a");
-      link.download = "drawing.png";
-      link.href = canvas.toDataURL("image/png");
-      link.click();
+  useEffect(() => {
+    const handleResize = () => {
+      if (canvasRef.current) {
+        canvasRef.current.width = window.innerWidth;
+        canvasRef.current.height = window.innerHeight - 60;
+      }
     };
 
-    return (
-      <div className="p-4 bg-[#c0c0c0] flex justify-center items-center">  
-        <div className="canvas-wrapper">
-          <canvas
-            ref={canvasRef}
-            width={window.innerWidth - 30}
-            height={window.innerHeight - 100}
-            className="bg-white"
-            onPointerDown={start}
-            onPointerMove={draw}
-            onPointerUp={end}
-          />
-        </div>  
+    window.addEventListener('resize', handleResize);
+    
+    // Инициализация canvas
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        // Начальная настройка контекста
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+      }
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  return (
+    <div className="canvas-container">
+      <canvas 
+        ref={canvasRef}
+        id="main-canvas"
+        width={window.innerWidth}
+        height={window.innerHeight - 60}
+      />
     </div>
-    );
-  }
-);
+  );
+};
 
 export default Canvas;
