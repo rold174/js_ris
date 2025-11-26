@@ -54,6 +54,12 @@ const Toolbar: React.FC<ToolbarProps> = ({
           >
             Ластик
           </button>
+          <button
+            className={`tool-btn ${toolState.tool === 'fill' ? 'active' : ''}`}
+            onClick={() => handleToolChange('fill')}
+          >
+            Заливка
+          </button>
         </div>
       </div>
 
@@ -66,9 +72,15 @@ const Toolbar: React.FC<ToolbarProps> = ({
             max="50"
             value={toolState.brushSize}
             onChange={(e) => handleBrushSizeChange(Number(e.target.value))}
+            disabled={toolState.tool === 'fill'}
           />
           <span>{toolState.brushSize}px</span>
         </div>
+        {toolState.tool === 'fill' && (
+          <div className="tool-info">
+            Кликните для заливки области
+          </div>
+        )}
       </div>
 
       <div className="toolbar-section">

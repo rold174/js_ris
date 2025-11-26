@@ -25,6 +25,7 @@
 .tools {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .tool-btn {
@@ -35,6 +36,7 @@
   cursor: pointer;
   transition: all 0.2s;
   font-size: 12px;
+  min-width: 60px;
 }
 
 .tool-btn:hover {
@@ -47,6 +49,11 @@
   border-color: #007bff;
 }
 
+.tool-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .brush-size {
   display: flex;
   align-items: center;
@@ -57,9 +64,20 @@
   width: 100px;
 }
 
+.brush-size input:disabled {
+  opacity: 0.5;
+}
+
 .brush-size span {
   font-size: 12px;
   min-width: 40px;
+}
+
+.tool-info {
+  font-size: 11px;
+  color: #666;
+  font-style: italic;
+  margin-top: 5px;
 }
 
 .colors {
