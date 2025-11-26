@@ -10,6 +10,7 @@ type ToolbarProps = {
 
   undo: () => void;
   redo: () => void;
+  saveImage: () => void;
 };
 
 export default function Toolbar({
@@ -21,6 +22,7 @@ export default function Toolbar({
   setLineWidth,
   undo,
   redo,
+  saveImage,
 }: ToolbarProps) {
   return (
     <div
@@ -32,7 +34,7 @@ export default function Toolbar({
         shadow-[inset_0_1px_0_#ffffff,inset_0_-1px_0_#8ea7c4]
       "
     >
-      {/* XP Tool Button */}
+      {/* Tool Button */}
       <Button active={tool === 'brush'} onClick={() => setTool('brush')}>
         🖌 Кисть
       </Button>
@@ -48,8 +50,7 @@ export default function Toolbar({
       <Button onClick={undo}>↶ Undo</Button>
       <Button onClick={redo}>↷ Redo</Button>
 
-      {/* Separator
-      <div className="w-[2px] h-10 bg-[#7b9bbd] shadow-[1px_0_0_#ffffff]" /> */}
+      <Button onClick={saveImage}>💾 Сохранить</Button>
 
       {/* Color Picker */}
       <div className="flex items-center gap-2">

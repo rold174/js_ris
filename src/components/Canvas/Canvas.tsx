@@ -6,6 +6,7 @@ import "../styles/styles.css";
 export type CanvasHandle = {
   undo: () => void;
   redo: () => void;
+  saveImage: () => void;
 };
 
 type CanvasProps = {
@@ -27,6 +28,7 @@ const Canvas = React.forwardRef<CanvasHandle, CanvasProps>(
     React.useImperativeHandle(ref, () => ({
       undo,
       redo,
+      saveImage,
     }));
 
     React.useEffect(() => {
@@ -77,6 +79,16 @@ const Canvas = React.forwardRef<CanvasHandle, CanvasProps>(
 
       isDrawing.current = false;
       ctxRef.current?.closePath();
+    };
+
+    const saveImage = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const link = document.createElement("a");
+      link.download = "drawing.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
     };
 
     return (

@@ -20,6 +20,7 @@ export default function App() {
         setLineWidth={setLineWidth}
         undo={() => canvasRef.current?.undo()}
         redo={() => canvasRef.current?.redo()}
+        saveImage={() => canvasRef.current?.saveImage()}
       />
 
       <Canvas
