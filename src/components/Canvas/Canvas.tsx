@@ -81,7 +81,7 @@ const Canvas = forwardRef<CanvasHandle, CanvasProps>(
         const uri = stageRef.current.toDataURL();
 
         const link = document.createElement("a");
-        link.download = "drawing.jpeg";
+        link.download = "drawing.jpg";
         link.href = uri;
         link.click();
       }
