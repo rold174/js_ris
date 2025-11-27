@@ -26,7 +26,7 @@ function App() {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const MAX_HISTORY = 25;
+  const MAX_HISTORY = 100;
 
   const saveToHistory = (canvasData: string) => {
     const newItem: HistoryItem = {

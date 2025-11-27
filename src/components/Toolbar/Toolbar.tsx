@@ -122,7 +122,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           </button>
         </div>
         <div className="history-info">
-          Действий: {historyLength} / 25
+          Действий: {historyLength} / 100
           <br />
           Текущее: {historyIndex + 1}
         </div>
