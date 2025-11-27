@@ -101,10 +101,10 @@ function App() {
     saveToHistory(blankData);
   };
 
-  const clearHistory = () => {
-    setHistory([]);
-    setHistoryIndex(-1);
-  };
+  // const clearHistory = () => {
+  //   setHistory([]);
+  //   setHistoryIndex(-1);
+  // };
 
   // Keyboard shortcuts: Ctrl+Z / Ctrl+Y / Ctrl+Shift+Z
   useEffect(() => {

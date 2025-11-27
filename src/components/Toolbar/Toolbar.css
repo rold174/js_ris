@@ -1,244 +1,208 @@
+/* Toolbar.css */
 .toolbar {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  padding: 8px;
-  background: #f0f0f0;
-  border: 2px inset #c0c0c0;
+  gap: 12px;
+  padding: 6px;
+  background: #c0c0c0;
+  border: 2px outset #c0c0c0;
   border-radius: 0;
-  width: 220px;
+  width: 12vw;
   min-height: 500px;
-  font-family: "Tahoma", "Arial", sans-serif;
-  font-size: 11px;
+  font-family: "Nineteen Ninety Three", monospace;
+  font-size: 12px;
   flex-shrink: 0;
-  order: 1; /* Тулбар будет слева */
+  image-rendering: pixelated;
 }
 
 .toolbar-section {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 8px;
-  background: #f0f0f0;
-  border: 1px solid #808080;
+  gap: 10px;
 }
 
 .toolbar-section h3 {
   margin: 0;
-  font-size: 11px;
-  color: #000;
-  font-weight: bold;
+  font-size: 14px;
+  font-weight: 600;
   text-align: left;
-  padding-bottom: 4px;
+  color: #333;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
 }
 
-/* Tools Section */
+/* Стили для инструментов */
 .tools {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px;
+  gap: 3px;
 }
 
-.tool-btn {
+.tool-btn, .tool-button {
   padding: 6px 4px;
-  border: 1px solid #808080;
-  background: linear-gradient(to bottom, #f0f0f0, #d4d4d4);
-  border-radius: 3px;
+  border: 2px outset #c0c0c0;
+  background: #c0c0c0;
+  border-radius: 0;
   cursor: pointer;
-  transition: all 0.1s;
+  transition: none;
   font-size: 11px;
-  font-family: "Tahoma", sans-serif;
+  font-family: "Nineteen Ninety Three", monospace;
   text-align: center;
   min-height: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 1px;
 }
 
-.tool-btn:hover {
-  background: linear-gradient(to bottom, #e8f4ff, #cce4ff);
+.tool-btn:hover, .tool-button:hover {
+  background: #d4d4d4;
 }
 
 .tool-btn.active {
-  background: linear-gradient(to bottom, #7b9ed7, #3a6ea5);
+  background: #000080;
   color: white;
-  border-color: #245ed1;
-  box-shadow: inset 1px 1px 0px #9bbde8,
-              inset -1px -1px 0px #2d5a9b;
+  border: 2px inset #c0c0c0;
 }
-
-.tool-btn:disabled {
-  opacity: 0.5;
+.tool-btn:disabled, .tool-button:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
-  background: #d4d4d4;
-  color: #808080;
+  background: #a0a0a0;
+  color: #666;
 }
 
-/* Brush Size Section */
-.brush-size-section {
+/* Стили для размера кисти */
+.brush-size {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
 }
 
-.brush-size-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.brush-size-options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px;
-}
-
-.brush-size-btn {
-  padding: 4px;
-  border: 1px solid #808080;
-  background: linear-gradient(to bottom, #f0f0f0, #d4d4d4);
+.brush-size input[type="range"] {
+  flex: 1;
+  height: 6px;
   border-radius: 3px;
+  background: #ddd;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.brush-size input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  background: #000080;
   cursor: pointer;
-  text-align: center;
-  font-size: 10px;
+} 
+
+.brush-size span {
+  font-size: 12px;
+  color: #000000;
+  min-width: 50px;
 }
 
-.brush-size-btn.active {
-  background: linear-gradient(to bottom, #7b9ed7, #3a6ea5);
-  color: white;
+.tool-info {
+  font-size: 11px;
+  color: #666;
+  font-style: italic;
+  margin-top: 5px;
 }
 
-/* Colors Section */
-.colors-section {
+/* Стили для цветов */
+.colors {
   display: flex;
-  flex-direction: column;
   gap: 8px;
-}
-
-.color-grid {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: 2px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .color-btn {
-  width: 20px;
-  height: 20px;
-  border: 1px solid #808080;
-  border-radius: 1px;
+  width: 30px;
+  height: 30px;
+  border: 2px solid #ddd;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .color-btn:hover {
   transform: scale(1.1);
-  border-color: #000;
+  border-color: #999;
+  
 }
 
 .color-btn.active {
-  border: 2px solid #000;
-  transform: scale(1.05);
-}
-
-.color-picker-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 5px;
-}
-
-.color-picker-label {
-  font-size: 11px;
-  color: #000;
+  border-color: #333;
+  box-shadow: 0 0 0 2px white, 0 0 0 4px #000080;
 }
 
 .color-picker {
-  width: 40px;
-  height: 20px;
-  border: 1px solid #808080;
-  border-radius: 2px;
+  width: 60px;
+  height: 30px;
+  border: 2px solid #ddd;
   cursor: pointer;
-  background: white;
+  padding: 0;
 }
 
-/* Shapes Section */
-.shapes-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.color-picker::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+  padding: 0;
 }
 
-.shapes-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
+.color-picker::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border: none;
 }
 
-.shape-btn {
-  padding: 8px 4px;
-  border: 1px solid #808080;
-  background: linear-gradient(to bottom, #f0f0f0, #d4d4d4);
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 14px;
-  text-align: center;
-  min-height: 35px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.color-picker::-moz-color-swatch {
+  border: none;
+  border-radius: 4px;
 }
 
-.shape-btn.active {
-  background: linear-gradient(to bottom, #7b9ed7, #3a6ea5);
-  color: white;
-}
-
-/* History Controls */
-.history-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
+/* Стили для истории */
 .history-controls {
   display: flex;
-  gap: 6px;
-  justify-content: center;
+  gap: 10px;
 }
 
 .history-btn {
-  padding: 6px 12px;
-  border: 1px solid #808080;
-  background: linear-gradient(to bottom, #f0f0f0, #d4d4d4);
-  border-radius: 3px;
+  padding: 6px 10px;
+  border: 2px outset #c0c0c0;
+  background: #c0c0c0;
+  border-radius: 0;
   cursor: pointer;
-  transition: all 0.1s;
+  transition: none;
   font-size: 11px;
-  font-family: "Tahoma", sans-serif;
+  font-family: "Nineteen Ninety Three", monospace;
   flex: 1;
+  transition: all 0.2s ease;
 }
 
 .history-btn:hover:not(:disabled) {
-  background: linear-gradient(to bottom, #e8f4ff, #cce4ff);
-}
-
-.history-btn:active:not(:disabled) {
-  box-shadow: inset 1px 1px 0px #808080,
-              inset -1px -1px 0px #ffffff;
+  background-color: #f8f9fa;
+  border-color: #999;
 }
 
 .history-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background: #d4d4d4;
 }
 
-.tool-info {
-  font-size: 10px;
-  color: #404040;
-  font-style: italic;
-  text-align: center;
-  margin-top: 3px;
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    height: auto;
+    min-width: auto;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .toolbar-section {
+    flex: 1;
+    min-width: 150px;
+  }
 }

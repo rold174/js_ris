@@ -211,7 +211,6 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({
         onMouseMove={handleMouseMove}
         onMouseUp={stopDrawing}
         onMouseLeave={stopDrawing}
-        style={{ cursor: toolState.tool === 'fill' || toolState.tool === 'brush' ? 'crosshair' : 'default' }}
       />
     </div>
   );

@@ -2,14 +2,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px;
-  gap: 10px;
-  background: #f0f0f0;
-  border: 2px inset #c0c0c0;
+  padding: 8px;
+  gap: 8px;
+  background: #c0c0c0;
+  border: 2px outset #c0c0c0;
   border-radius: 0;
   flex: 1;
   min-height: 500px;
-  order: 2; /* Холст будет справа */
+  order: 2;
+  font-family: "Nineteen Ninety Three", monospace;
 }
 
 #main-canvas {
@@ -20,11 +21,12 @@
   box-shadow: none;
   max-width: 100%;
   max-height: 100%;
+  image-rendering: pixelated;
 }
 
 .canvas-area {
-  background: #f0f0f0;
-  padding: 5px;
+  background: #c0c0c0;
+  padding: 4px;
   border: 1px solid #808080;
   flex: 1;
   display: flex;
@@ -33,28 +35,3 @@
   width: 100%;
 }
 
-.clear-btn {
-  padding: 4px 15px;
-  background: linear-gradient(to bottom, #f0f0f0, #d4d4d4);
-  color: #000;
-  border: 1px solid #808080;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 11px;
-  font-family: "Tahoma", sans-serif;
-  font-weight: bold;
-  box-shadow: inset 1px 1px 0px #ffffff,
-              inset -1px -1px 0px #808080;
-  transition: all 0.1s;
-  margin-top: 10px;
-}
-
-.clear-btn:hover {
-  background: linear-gradient(to bottom, #e8f4ff, #cce4ff);
-}
-
-.clear-btn:active {
-  box-shadow: inset 1px 1px 0px #808080,
-              inset -1px -1px 0px #ffffff;
-  background: #d4d4d4;
-}
