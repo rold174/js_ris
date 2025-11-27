@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import './App.css';
 import Canvas from '../Canvas/Canvas';
 import Toolbar from '../Toolbar/Toolbar';
-import StartPage from '../StartPage/StartPage';
 
 export interface ToolState {
   tool: string;
@@ -84,7 +83,7 @@ function App() {
 
   return (
     <div className="App">
-      <StartPage />
+      
       <Toolbar 
         toolState={toolState}
         setToolState={setToolState}

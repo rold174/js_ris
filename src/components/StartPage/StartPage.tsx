@@ -1,12 +1,14 @@
-import React from 'react';
-import './StartPage.css';
+import { Link } from "react-router-dom";
+import "../StartPage/StartPage.css"; // подключаем стили
 
-const StartPage: React.FC = () => {
+export default function StartPage() {
   return (
-    <div className="start-page">
-      
+    <div className="start-container">
+      <h1 className="start-title">Привет</h1>
+
+      <Link to="/app" className="start-btn">
+        Перейти
+      </Link>
     </div>
   );
-};
-
-export default StartPage;
+}
