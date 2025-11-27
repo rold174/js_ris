@@ -1,7 +1,6 @@
 import React from 'react';
 import './Toolbar.css';
 import { ToolState } from '../App/App';
-// import { clearCanvas } from '../Canvas/Canvas';
 
 interface ToolbarProps {
   toolState: ToolState;
@@ -19,7 +18,8 @@ const Toolbar: React.FC<ToolbarProps> = ({
   undo,
   redo,
   canUndo,
-  canRedo
+  canRedo,
+  clearCanvas, 
 }) => {
   const colors = ['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
 
@@ -33,7 +33,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
   const handleBrushSizeChange = (size: number) => {
     setToolState({ ...toolState, brushSize: size });
-  };  
+  };
 
   return (
     <div className="toolbar">
@@ -43,32 +43,34 @@ const Toolbar: React.FC<ToolbarProps> = ({
           <button
             className={`tool-btn ${toolState.tool === 'brush' ? 'active' : ''}`}
             onClick={() => handleToolChange('brush')}
+            title="Кисть"
           >
             🖌️
           </button>
           <button
             className={`tool-btn ${toolState.tool === 'eraser' ? 'active' : ''}`}
             onClick={() => handleToolChange('eraser')}
+            title="Ластик"
           >
             🧽
           </button>
           <button
             className={`tool-btn ${toolState.tool === 'fill' ? 'active' : ''}`}
             onClick={() => handleToolChange('fill')}
+            title="Заливка"
           >
             🧺
           </button>
-          <button 
-            className={`tool-button ${toolState.tool === 'clear' ? 'active' : ''}`}
+          <button
+            className="tool-button"
             onClick={() => {
-              const canvas = document.querySelector('canvas') as HTMLCanvasElement;
-              const ctx = canvas.getContext('2d');
-              ctx?.clearRect(0, 0, canvas.width, canvas.height);
+              clearCanvas();
             }}
-            >
-              🚮
+            title="Очистить холст"
+          >
+            🚮
           </button>
-        </div>        
+        </div>
       </div>
 
       <div className="toolbar-section">
@@ -85,9 +87,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
           <span>{toolState.brushSize}px</span>
         </div>
         {toolState.tool === 'fill' && (
-          <div className="tool-info">
-            Кликните для заливки области
-          </div>
+          <div className="tool-info">Кликните для заливки области</div>
         )}
       </div>
 
@@ -114,20 +114,8 @@ const Toolbar: React.FC<ToolbarProps> = ({
       <div className="toolbar-section">
         <h3>История</h3>
         <div className="history-controls">
-          <button 
-            onClick={undo} 
-            disabled={!canUndo}
-            className="history-btn"
-          >
-            Назад
-          </button>
-          <button 
-            onClick={redo} 
-            disabled={!canRedo}
-            className="history-btn"
-          >
-            Вперед
-          </button>
+          <button onClick={undo} disabled={!canUndo} className="history-btn">Назад</button>
+          <button onClick={redo} disabled={!canRedo} className="history-btn">Вперед</button>
         </div>
       </div>
     </div>
