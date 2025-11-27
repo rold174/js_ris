@@ -4,26 +4,42 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background: #20232a;
+  background: linear-gradient(135deg, #245ed1 0%, #3a7be0 50%, #5b9af5 100%);
+  font-family: "Tahoma", "Arial", sans-serif;
 }
 
 .start-title {
-  font-size: 60px;
-  color: #61dafb;
+  font-size: 48px;
+  color: white;
   margin-bottom: 40px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+  letter-spacing: 1px;
 }
 
 .start-btn {
-  padding: 15px 40px;
-  font-size: 22px;
-  background: #61dafb;
-  border-radius: 12px;
+  padding: 12px 35px;
+  font-size: 18px;
+  background: linear-gradient(to bottom, #f0f0f0, #d4d4d4);
+  border: 2px outset #c0c0c0;
+  border-radius: 4px;
   color: #000;
   text-decoration: none;
-  transition: 0.3s;
+  font-family: "Tahoma", sans-serif;
+  font-weight: bold;
+  box-shadow: inset 1px 1px 0px #ffffff,
+              inset -1px -1px 0px #808080,
+              3px 3px 8px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s;
 }
 
 .start-btn:hover {
-  transform: scale(1.1);
-  background: #3fa8d1;
+  background: linear-gradient(to bottom, #e8f4ff, #cce4ff);
+  transform: translateY(-2px);
+}
+
+.start-btn:active {
+  box-shadow: inset 1px 1px 0px #808080,
+              inset -1px -1px 0px #ffffff;
+  transform: translateY(0);
 }
