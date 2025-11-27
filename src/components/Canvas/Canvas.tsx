@@ -218,18 +218,6 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({
     }
   };
 
-  const clearCanvas = () => {
-    const canvas = internalCanvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      saveToHistory(canvas.toDataURL());
-      clearHistory();
-    }
-  };
-
   return (
     <div className="canvas-container">
       <canvas
@@ -246,11 +234,6 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({
                  toolState.tool === 'brush' ? 'crosshair' : 'default' 
         }}
       />
-      <div className="canvas-controls">
-        <button onClick={clearCanvas} className="clear-btn">
-          🚮
-        </button>
-      </div>
     </div>
   );
 });

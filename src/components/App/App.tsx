@@ -60,6 +60,14 @@ function App() {
     }
   };
 
+  const clearCanvas = () => {
+  const canvas = canvasRef.current;
+  const ctx = canvas?.getContext("2d");
+  if (canvas && ctx) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+};
+
   const restoreFromHistory = (index: number) => {
     const item = history[index];
     if (item && canvasRef.current) {
@@ -89,10 +97,10 @@ function App() {
         setToolState={setToolState}
         undo={undo}
         redo={redo}
-        canUndo={historyIndex > 0}
+        canUndo={historyIndex >= 0}
         canRedo={historyIndex < history.length - 1}
-        historyLength={history.length}
-        historyIndex={historyIndex}
+        clearCanvas={clearCanvas}
+        
       />
       <Canvas
         ref={canvasRef}
@@ -101,6 +109,7 @@ function App() {
         toolState={toolState}
         saveToHistory={saveToHistory}
         clearHistory={clearHistory}
+        
       />
     </div>
   );

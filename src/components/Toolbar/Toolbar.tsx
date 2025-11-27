@@ -1,6 +1,7 @@
 import React from 'react';
 import './Toolbar.css';
 import { ToolState } from '../App/App';
+// import { clearCanvas } from '../Canvas/Canvas';
 
 interface ToolbarProps {
   toolState: ToolState;
@@ -9,8 +10,7 @@ interface ToolbarProps {
   redo: () => void;
   canUndo: boolean;
   canRedo: boolean;
-  historyLength: number;
-  historyIndex: number;
+  clearCanvas: () => void;
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
@@ -19,9 +19,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
   undo,
   redo,
   canUndo,
-  canRedo,
-  historyLength,
-  historyIndex
+  canRedo
 }) => {
   const colors = ['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
 
@@ -35,7 +33,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
   const handleBrushSizeChange = (size: number) => {
     setToolState({ ...toolState, brushSize: size });
-  };
+  };  
 
   return (
     <div className="toolbar">
@@ -60,7 +58,17 @@ const Toolbar: React.FC<ToolbarProps> = ({
           >
             🧺
           </button>
-        </div>
+          <button 
+            className={`tool-button ${toolState.tool === 'clear' ? 'active' : ''}`}
+            onClick={() => {
+              const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+              const ctx = canvas.getContext('2d');
+              ctx?.clearRect(0, 0, canvas.width, canvas.height);
+            }}
+            >
+              🚮
+          </button>
+        </div>        
       </div>
 
       <div className="toolbar-section">
@@ -120,11 +128,6 @@ const Toolbar: React.FC<ToolbarProps> = ({
           >
             Вперед
           </button>
-        </div>
-        <div className="history-info">
-          Действий: {historyLength} / 100
-          <br />
-          Текущее: {historyIndex + 1}
         </div>
       </div>
     </div>
