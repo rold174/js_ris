@@ -5,7 +5,7 @@
   padding: 8px;
   gap: 8px;
   background: #c0c0c0;
-  border: 2px outset #c0c0c0;
+  border: 2px solid #c0c0c0;
   border-radius: 0;
   flex: 1;
   min-height: 500px;
@@ -45,7 +45,7 @@
   width: 100%;
   max-width: 400px;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-  font-family: "Tahoma", "Arial", sans-serif;
+  font-family: "Nineteen Ninety Three", monospace;
   font-size: 11px;
 }
 
@@ -162,29 +162,6 @@
 .room-info__copy-btn:focus {
   outline: 1px dotted #000000;
   outline-offset: 1px;
-}
-
-/* Адаптивность для Windows XP стиля */
-@media (max-width: 768px) {
-  .room-info {
-    padding: 8px;
-    max-width: 300px;
-  }
-  
-  .room-info__id {
-    flex-direction: column;
-    gap: 6px;
-    text-align: center;
-  }
-  
-  .room-info__value {
-    font-size: 11px;
-    letter-spacing: 0.5px;
-  }
-  
-  .room-info__title {
-    font-size: 11px;
-  }
 }
 
 /* Анимация появления в стиле XP */

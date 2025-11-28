@@ -129,23 +129,31 @@ function App() {
 
   return (
     <div className="App">
-      <Toolbar
-        toolState={toolState}
-        setToolState={setToolState}
-        undo={undo}
-        redo={redo}
-        canUndo={canUndo}
-        canRedo={canRedo}
-        clearCanvas={clearCanvas}
-      />
+      <div className="app-header">
+        <div className="header-title">
+          <span className="header-text">Risovashka</span>
+        </div>
+      </div>
+      
+      <div className="app-content">
+        <Toolbar
+          toolState={toolState}
+          setToolState={setToolState}
+          undo={undo}
+          redo={redo}
+          canUndo={canUndo}
+          canRedo={canRedo}
+          clearCanvas={clearCanvas}
+        />
 
-      <Canvas
-        ref={canvasRef}
-        isDrawing={isDrawing}
-        setIsDrawing={setIsDrawing}
-        toolState={toolState}
-        saveToHistory={saveToHistory}
-      />
+        <Canvas
+          ref={canvasRef}
+          isDrawing={isDrawing}
+          setIsDrawing={setIsDrawing}
+          toolState={toolState}
+          saveToHistory={saveToHistory}
+        />
+      </div>
     </div>
   );
 }

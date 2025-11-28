@@ -5,7 +5,7 @@
   gap: 12px;
   padding: 6px;
   background: #c0c0c0;
-  border: 2px outset #c0c0c0;
+  border: 2px solid #c0c0c0;
   border-radius: 0;
   width: 12vw;
   min-height: 500px;

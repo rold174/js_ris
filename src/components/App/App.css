@@ -5,7 +5,7 @@
   font-family: "Nineteen Ninety Three", monospace;
   padding: 0;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   image-rendering: pixelated;
 }
 
@@ -16,21 +16,54 @@
   image-rendering: pixelated;
 }
 
- body {
+body {
   background: #c0c0c0;
   overflow-x: hidden;
   font-family: "Nineteen Ninety Three", monospace;
 }
 
-.main-content {
+/* Синяя шапка в стиле Windows XP */
+.app-header {
+  background: linear-gradient(90deg, #0a246a 0%, #316ac5 100%);
+  color: white;
+  padding: 6px 12px;
+  border-bottom: 1px solid #808080;
+  display: flex;
+  align-items: center;
+  height: 32px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  position: relative;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Nineteen Ninety Three", monospace;
+}
+
+.header-icon {
+  font-size: 16px;
+  filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.3));
+}
+
+.header-text {
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
+}
+
+/* Основной контент */
+.app-content {
   display: flex;
   flex: 1;
   padding: 8px;
   gap: 8px;
   align-items: flex-start;
   flex-direction: row;
-}  
-
-
+  height: calc(100vh - 32px);
+}
 
 @import url('https://fonts.cdnfonts.com/css/nineteen-ninety-three');
