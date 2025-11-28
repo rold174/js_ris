@@ -4,6 +4,7 @@ import React, {
   useRef,
   useEffect
 } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import './Canvas.css';
 import { ToolState } from '../App/App';
 
@@ -20,6 +21,9 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({
   toolState,
   saveToHistory
 }, ref) => {
+  const [searchParams] = useSearchParams();
+  const roomId = searchParams.get('room');
+  
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
   const drawingRef = useRef(false);
@@ -212,6 +216,34 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({
         onMouseUp={stopDrawing}
         onMouseLeave={stopDrawing}
       />
+      
+      {/* Отображение ID комнаты под холстом */}
+      {roomId && (
+        <div className="room-info">
+          <div className="room-info__header">
+            <h3 className="room-info__title">Комната для рисования</h3>
+          </div>
+          <div className="room-info__content">
+            <div className="room-info__id">
+              <span className="room-info__label">ID комнаты:</span>
+              <span className="room-info__value">{roomId}</span>
+            </div>
+            <div className="room-info__actions">
+              <button 
+                className="room-info__copy-btn"
+                onClick={() => navigator.clipboard.writeText(roomId)}
+              >
+                📋 Копировать ID
+              </button>
+            </div>
+          </div>
+          <div className="room-info__footer">
+            <span className="room-info__hint">
+              Поделитесь этим ID с друзьями для совместного рисования
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 });

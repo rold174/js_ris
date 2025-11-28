@@ -35,3 +35,185 @@
   width: 100%;
 }
 
+/* Windows XP Style Room Info */
+.room-info {
+  background: linear-gradient(to bottom, #ece9d8 0%, #ffffff 100%);
+  color: #000000;
+  border: 2px outset #c0c0c0;
+  border-radius: 0;
+  padding: 12px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  font-family: "Tahoma", "Arial", sans-serif;
+  font-size: 11px;
+}
+
+.room-info__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #808080;
+  background: linear-gradient(90deg, #0a246a 0%, #316ac5 100%);
+  margin: -12px -12px 12px -12px;
+  padding: 8px 12px;
+  color: white;
+}
+
+.room-info__icon {
+  font-size: 16px;
+  filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.3));
+}
+
+.room-info__title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.room-info__content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.room-info__id {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  padding: 8px 12px;
+  border: 1px inset #c0c0c0;
+  border-radius: 0;
+  font-family: "Nineteen Ninety Three", monospace;
+}
+
+.room-info__label {
+  font-weight: bold;
+  font-size: 11px;
+  color: #000000;
+}
+
+.room-info__value {
+  font-family: "Nineteen Ninety Three", monospace;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  background: #ffffff;
+  padding: 4px 8px;
+  border: 1px inset #c0c0c0;
+  border-radius: 0;
+  color: #000080;
+  flex: 1;
+  text-align: center;
+}
+
+.room-info__actions {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0;
+}
+
+.room-info__copy-btn {
+  background: linear-gradient(to bottom, #ece9d8 0%, #d4d0c8 100%);
+  color: #000000;
+  border: 2px outset #c0c0c0;
+  padding: 6px 16px;
+  border-radius: 0;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: normal;
+  font-family: "Nineteen Ninety Three", monospace;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 22px;
+}
+
+.room-info__copy-btn:hover {
+  background: linear-gradient(to bottom, #f6f4e8 0%, #e8e4d8 100%);
+}
+
+.room-info__copy-btn:active {
+  background: linear-gradient(to bottom, #d4d0c8 0%, #ece9d8 100%);
+  border: 2px inset #c0c0c0;
+  padding: 7px 15px 5px 17px;
+}
+
+.room-info__footer {
+  text-align: center;
+  padding-top: 8px;
+  border-top: 1px solid #808080;
+  margin-top: 8px;
+}
+
+.room-info__hint {
+  font-size: 10px;
+  color: #666666;
+  font-style: normal;
+  line-height: 1.3;
+}
+
+/* Windows XP specific button states */
+.room-info__copy-btn:focus {
+  outline: 1px dotted #000000;
+  outline-offset: 1px;
+}
+
+/* Адаптивность для Windows XP стиля */
+@media (max-width: 768px) {
+  .room-info {
+    padding: 8px;
+    max-width: 300px;
+  }
+  
+  .room-info__id {
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
+  }
+  
+  .room-info__value {
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+  
+  .room-info__title {
+    font-size: 11px;
+  }
+}
+
+/* Анимация появления в стиле XP */
+@keyframes xpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.room-info {
+  animation: xpFadeIn 0.3s ease-out;
+}
+
+/* Стиль для активного состояния (когда копирование выполнено) */
+.room-info__copy-btn.copied {
+  background: linear-gradient(to bottom, #c0c0c0 0%, #a0a0a0 100%);
+  color: #404040;
+  border: 2px inset #c0c0c0;
+}
+
+/* Стиль для отключенной кнопки */
+.room-info__copy-btn:disabled {
+  background: linear-gradient(to bottom, #e0e0e0 0%, #c8c8c8 100%);
+  color: #808080;
+  cursor: not-allowed;
+  border: 2px outset #c0c0c0;
+}

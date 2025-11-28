@@ -101,11 +101,6 @@ function App() {
     saveToHistory(blankData);
   };
 
-  // const clearHistory = () => {
-  //   setHistory([]);
-  //   setHistoryIndex(-1);
-  // };
-
   // Keyboard shortcuts: Ctrl+Z / Ctrl+Y / Ctrl+Shift+Z
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -116,10 +111,10 @@ function App() {
         if (e.shiftKey) {
           redo(); // Ctrl+Shift+Z => redo
         } else {
-          undo();
+          undo(); // Ctrl+Z => undo
         }
         e.preventDefault();
-      } else if (mod && (e.key === 'y')) {
+      } else if (mod && e.key === 'y') {
         redo(); // Ctrl+Y => redo
         e.preventDefault();
       }
@@ -150,8 +145,6 @@ function App() {
         setIsDrawing={setIsDrawing}
         toolState={toolState}
         saveToHistory={saveToHistory}
-        // when restoring from outside, Canvas doesn't need to do the undo itself,
-        // App drives restoreFromHistory through undo/redo above
       />
     </div>
   );
