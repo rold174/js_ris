@@ -1,6 +1,10 @@
 import React from 'react';
 import './Toolbar.css';
-import { ToolState } from '../App/App';
+import { ToolState } from '../utils/ToolState';
+import ToolsSection from './ToolsSection';
+import BrushSizeSection from './BrushSizeSection';
+import ColorSection from './ColorSection';
+import HistorySection from './HistorySection';
 
 interface ToolbarProps {
   toolState: ToolState;
@@ -19,10 +23,8 @@ const Toolbar: React.FC<ToolbarProps> = ({
   redo,
   canUndo,
   canRedo,
-  clearCanvas, 
+  clearCanvas,
 }) => {
-  const colors = ['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
-
   const handleToolChange = (tool: string) => {
     setToolState({ ...toolState, tool });
   };
@@ -37,87 +39,28 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
   return (
     <div className="toolbar">
-      <div className="toolbar-section">
-        <h3>Инструменты</h3>
-        <div className="tools">
-          <button
-            className={`tool-btn ${toolState.tool === 'brush' ? 'active' : ''}`}
-            onClick={() => handleToolChange('brush')}
-            title="Кисть"
-          >
-            🖌️
-          </button>
-          <button
-            className={`tool-btn ${toolState.tool === 'eraser' ? 'active' : ''}`}
-            onClick={() => handleToolChange('eraser')}
-            title="Ластик"
-          >
-            🧽
-          </button>
-          <button
-            className={`tool-btn ${toolState.tool === 'fill' ? 'active' : ''}`}
-            onClick={() => handleToolChange('fill')}
-            title="Заливка"
-          >
-            🧺
-          </button>
-          <button
-            className="tool-button"
-            onClick={() => {
-              clearCanvas();
-            }}
-            title="Очистить холст"
-          >
-            🚮
-          </button>
-        </div>
-      </div>
+      <ToolsSection
+        toolState={toolState}
+        onToolChange={handleToolChange}
+        onClearCanvas={clearCanvas}
+      />
 
-      <div className="toolbar-section">
-        <h3>Размер кисти</h3>
-        <div className="brush-size">
-          <input
-            type="range"
-            min="1"
-            max="300"
-            value={toolState.brushSize}
-            onChange={(e) => handleBrushSizeChange(Number(e.target.value))}
-            disabled={toolState.tool === 'fill'}
-          />
-          <span>{toolState.brushSize}px</span>
-        </div>
-        {toolState.tool === 'fill' && (
-          <div className="tool-info">Кликните для заливки области</div>
-        )}
-      </div>
+      <BrushSizeSection
+        toolState={toolState}
+        onBrushSizeChange={handleBrushSizeChange}
+      />
 
-      <div className="toolbar-section">
-        <h3>Цвет</h3>
-        <div className="colors">
-          {colors.map((color, index) => (
-            <button
-              key={index}
-              className={`color-btn ${toolState.color === color ? 'active' : ''}`}
-              style={{ backgroundColor: color }}
-              onClick={() => handleColorChange(color)}
-            />
-          ))}
-          <input
-            type="color"
-            value={toolState.color}
-            onChange={(e) => handleColorChange(e.target.value)}
-            className="color-picker"
-          />
-        </div>
-      </div>
+      <ColorSection
+        toolState={toolState}
+        onColorChange={handleColorChange}
+      />
 
-      <div className="toolbar-section">
-        <h3>История</h3>
-        <div className="history-controls">
-          <button onClick={undo} disabled={!canUndo} className="history-btn">Назад</button>
-          <button onClick={redo} disabled={!canRedo} className="history-btn">Вперед</button>
-        </div>
-      </div>
+      <HistorySection
+        onUndo={undo}
+        onRedo={redo}
+        canUndo={canUndo}
+        canRedo={canRedo}
+      />
     </div>
   );
 };
