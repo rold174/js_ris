@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom'; // Добавьте этот импорт
 import './App.css';
 import Canvas from '../Canvas/Canvas';
 import Toolbar from '../Toolbar/Toolbar';
@@ -6,8 +7,12 @@ import AppHeader from './AppHeader';
 import { ToolState } from '../utils/ToolState';
 import { useHistory } from '../utils/useHistory';
 import { useKeyboardShortcuts } from '../utils/useKeyboardShortcuts';
+import { useSharedCanvas } from '../utils/useSharedCanvas'; // Новый хук
 
 function App() {
+  const [searchParams] = useSearchParams(); // Получаем параметры URL
+  const roomId = searchParams.get('room'); // ID комнаты из URL
+  
   const [isDrawing, setIsDrawing] = useState(false);
   const [toolState, setToolState] = useState<ToolState>({
     tool: 'brush',
@@ -23,6 +28,19 @@ function App() {
     saveToHistory,
     restoreFromHistory
   } = useHistory(toolState);
+
+  // Используем хук для совместного рисования
+  const {
+    sendDrawing,
+    sendClearCanvas,
+    sendFillCanvas,
+    replayDrawingHistory
+  } = useSharedCanvas({
+    roomId: roomId || '',
+    canvasRef,
+    toolState,
+    userId: localStorage.getItem('userId') || `user_${Date.now()}`
+  });
 
   const undo = () => {
     if (historyIndex > 0) {
@@ -52,7 +70,7 @@ function App() {
     }
   };
 
-  const clearCanvas = () => {
+  const clearCanvas = useCallback(() => {
     if (!canvasRef.current) return;
     const ctx = canvasRef.current.getContext('2d');
     if (!ctx) return;
@@ -60,7 +78,12 @@ function App() {
 
     const blankData = canvasRef.current.toDataURL();
     saveToHistory(blankData);
-  };
+    
+    // Если мы в комнате, очищаем для всех участников
+    if (roomId) {
+      sendClearCanvas();
+    }
+  }, [saveToHistory, roomId, sendClearCanvas]);
 
   useKeyboardShortcuts(undo, redo);
 
@@ -80,6 +103,7 @@ function App() {
           canUndo={canUndo}
           canRedo={canRedo}
           clearCanvas={clearCanvas}
+          isInRoom={!!roomId} // Передаем информацию о комнате
         />
 
         <Canvas
@@ -88,6 +112,12 @@ function App() {
           setIsDrawing={setIsDrawing}
           toolState={toolState}
           saveToHistory={saveToHistory}
+          // Передаем функции для совместного рисования
+          onDraw={sendDrawing}
+          onClearCanvas={clearCanvas}
+          onFillCanvas={sendFillCanvas}
+          roomId={roomId || ''}
+          replayDrawingHistory={replayDrawingHistory}
         />
       </div>
     </div>

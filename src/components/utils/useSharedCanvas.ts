@@ -12,7 +12,7 @@ import { ToolState } from './ToolState';
 
 interface UseSharedCanvasProps {
   roomId: string;
-  canvasRef: React.RefObject<HTMLCanvasElement | null>; // Измените тип
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
   toolState: ToolState;
   userId: string;
 }
@@ -23,12 +23,7 @@ export const useSharedCanvas = ({
   toolState,
   userId
 }: UseSharedCanvasProps) => {
-  const drawingBufferRef = useRef<Array<{prevX: number, prevY: number, x: number, y: number}>>([]);
-  const flushTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const drawingHistory = useRef<DrawingData[]>([]);
-  const isDrawingRef = useRef(false);
-  const lastSentRef = useRef<number>(0);
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Рисование на локальном холсте
   const drawOnCanvas = useCallback((data: DrawingData) => {
@@ -51,9 +46,6 @@ export const useSharedCanvas = ({
       ctx.stroke();
     } else if (type === 'clear') {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-    } else if (type === 'fill') {
-      ctx.fillStyle = color;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
   }, [canvasRef]);
 
@@ -106,78 +98,36 @@ export const useSharedCanvas = ({
       unsubscribe();
       removeActiveUser(roomId, userId);
       clearInterval(activityInterval);
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
     };
   }, [roomId, userId, replayDrawingHistory]);
 
-  // Отправка действия рисования с дебаунсом
-  // Обновите функцию sendDrawing:
-const sendDrawing = useCallback(async (
-  prevX: number,
-  prevY: number,
-  x: number,
-  y: number
-) => {
-  if (!roomId || !userId) return;
-  
-  const drawingData: DrawingData = {
-    type: 'draw',
-    x,
-    y,
-    prevX,
-    prevY,
-    color: toolState.color,
-    brushSize: toolState.brushSize,
-    timestamp: Date.now(),
-    userId
-  };
-  
-  try {
-    // ОТПРАВЛЯЕМ БЕЗ ОЖИДАНИЯ - пусть отправляется в фоне
-    sendDrawingAction(roomId, drawingData).catch(error => {
-      console.error('Ошибка отправки:', error);
-    });
+  // Отправка действия рисования
+  const sendDrawing = useCallback(async (
+    prevX: number,
+    prevY: number,
+    x: number,
+    y: number
+  ) => {
+    if (!roomId || !userId) return;
     
-    // Локально рисуем сразу
-    drawOnCanvas(drawingData);
-  } catch (error) {
-    console.error('Ошибка при отправке рисования:', error);
-  }
-}, [roomId, userId, toolState, drawOnCanvas]);
-
-const flushDrawingBuffer = useCallback(async () => {
-  if (drawingBufferRef.current.length === 0) return;
-  
-  const buffer = [...drawingBufferRef.current];
-  drawingBufferRef.current = [];
-  
-  const now = Date.now();
-  
-  // Отправляем все точки из буфера
-  for (const point of buffer) {
     const drawingData: DrawingData = {
       type: 'draw',
-      x: point.x,
-      y: point.y,
-      prevX: point.prevX,
-      prevY: point.prevY,
-      color: toolState.color,
+      x,
+      y,
+      prevX,
+      prevY,
+      color: toolState.tool === 'eraser' ? '#FFFFFF' : toolState.color,
       brushSize: toolState.brushSize,
-      timestamp: now,
+      timestamp: Date.now(),
       userId
     };
     
     try {
       await sendDrawingAction(roomId, drawingData);
-      // Рисуем локально
-      drawOnCanvas(drawingData);
     } catch (error) {
       console.error('Ошибка при отправке рисования:', error);
     }
-  }
-}, [roomId, userId, toolState, drawOnCanvas]);
+  }, [roomId, userId, toolState]);
 
   // Отправка действия очистки
   const sendClearCanvas = useCallback(async () => {
@@ -193,36 +143,15 @@ const flushDrawingBuffer = useCallback(async () => {
     
     try {
       await sendDrawingAction(roomId, clearData);
-      drawOnCanvas(clearData);
     } catch (error) {
       console.error('Ошибка при отправке очистки:', error);
     }
-  }, [roomId, userId, drawOnCanvas]);
-
-  // Отправка действия заливки
-  const sendFillCanvas = useCallback(async () => {
-    if (!roomId || !userId) return;
-    
-    const fillData: DrawingData = {
-      type: 'fill',
-      color: toolState.color,
-      brushSize: 0,
-      timestamp: Date.now(),
-      userId
-    };
-    
-    try {
-      await sendDrawingAction(roomId, fillData);
-      drawOnCanvas(fillData);
-    } catch (error) {
-      console.error('Ошибка при отправке заливки:', error);
-    }
-  }, [roomId, userId, toolState.color, drawOnCanvas]);
+  }, [roomId, userId]);
 
   return {
     sendDrawing,
     sendClearCanvas,
-    sendFillCanvas,
+    sendFillCanvas: sendClearCanvas, // Простая заливка (очистка цветом)
     replayDrawingHistory
   };
 };

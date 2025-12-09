@@ -1,72 +1,41 @@
-import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState } from 'react';
 import './Canvas.css';
 import { ToolState } from '../utils/ToolState';
 import RoomInfo from './RoomInfo';
-import { useSharedCanvas } from '../utils/useSharedCanvas';
-import { initializeRoomCanvas } from '../utils/roomManager';
-import { getUserId } from '../utils/firebaseRealtime';
-import { useCanvasDrawing } from '../utils/useCanvasDrawing'; // Импортируем улучшенный хук
+import { useCanvasDrawing } from '../utils/useCanvasDrawing';
 
 interface CanvasProps {
   isDrawing: boolean;
   setIsDrawing: (drawing: boolean) => void;
   toolState: ToolState;
   saveToHistory: (canvasData: string) => void;
+  onDraw?: (prevX: number, prevY: number, x: number, y: number) => void;
+  onClearCanvas?: () => void;
+  onFillCanvas?: () => void;
+  roomId?: string;
+  replayDrawingHistory?: () => void;
 }
 
 const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({
   isDrawing,
   setIsDrawing,
   toolState,
-  saveToHistory
+  saveToHistory,
+  onDraw,
+  onClearCanvas,
+  onFillCanvas,
+  roomId,
+  replayDrawingHistory
 }, ref) => {
-  const [searchParams] = useSearchParams();
-  const roomId = searchParams.get('room');
-  const [activeUsers, setActiveUsers] = useState<string[]>([]);
-  
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const userId = getUserId();
-
-  const {
-    sendDrawing,
-    sendClearCanvas,
-    sendFillCanvas,
-    replayDrawingHistory
-  } = useSharedCanvas({
-    roomId: roomId || '',
-    canvasRef,
-    toolState,
-    userId
-  });
-
-  // Колбэк для отправки рисования
-const handleDraw = useCallback((prevX: number, prevY: number, x: number, y: number) => {
-  if (roomId) {
-    // ОТПРАВЛЯЕМ БЕЗ ДЕБАУНСА - пусть firebase сам разберется
-    sendDrawing(prevX, prevY, x, y);
-  }
-}, [roomId, sendDrawing]);
-
-  // Используем улучшенный хук для рисования
+  
+  // Используем ваш существующий хук для рисования
   const {
     startDrawing,
     handleMouseMove,
-    stopDrawing
-  } = useCanvasDrawing(
-    canvasRef,
-    toolState,
-    setIsDrawing,
-    saveToHistory,
-    handleDraw // Передаем колбэк для синхронизации
-  );
-
-  // Инициализация холста при загрузке
-  useEffect(() => {
-    if (roomId) {
-      initializeRoomCanvas(roomId);
-    }
-  }, [roomId]);
+    stopDrawing,
+    isDrawingRef
+  } = useCanvasDrawing(canvasRef, toolState, setIsDrawing, saveToHistory, onDraw);
 
   useImperativeHandle(ref, () => {
     if (!canvasRef.current) {
@@ -75,27 +44,36 @@ const handleDraw = useCallback((prevX: number, prevY: number, x: number, y: numb
     return canvasRef.current;
   });
 
-  // Инициализация canvas context
-  // В Canvas.tsx в useEffect инициализации:
+  // Инициализация холста
   useEffect(() => {
-  const canvas = canvasRef.current;
-  if (!canvas) return;
-  
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  
-  // Критически важные настройки для плавного рисования
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'high';
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  ctx.globalCompositeOperation = 'source-over';
-  
-  // Начальные настройки
-  ctx.strokeStyle = '#000000';
-  ctx.lineWidth = 5;
-  
-  }, []);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    // Сохраняем пустой холст в историю
+    setTimeout(() => {
+      if (canvas) saveToHistory(canvas.toDataURL());
+    }, 0);
+    
+    // Загружаем историю рисования из Firebase если есть
+    if (roomId && replayDrawingHistory) {
+      setTimeout(() => {
+        replayDrawingHistory();
+      }, 100);
+    }
+  }, [roomId, replayDrawingHistory, saveToHistory]);
+
+  // Обработчик для инструмента заливки
+  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (toolState.tool === 'fill' && onFillCanvas) {
+      onFillCanvas();
+      return;
+    }
+    startDrawing(e);
+  };
 
   return (
     <div className="canvas-container">
@@ -104,46 +82,13 @@ const handleDraw = useCallback((prevX: number, prevY: number, x: number, y: numb
         id="main-canvas"
         width={1600}
         height={600}
-        onMouseDown={startDrawing}
+        onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={stopDrawing}
         onMouseLeave={stopDrawing}
       />
       
-      {roomId && <RoomInfo roomId={roomId} activeUsers={activeUsers} />}
-      
-      {/* Панель совместного рисования */}
-      {roomId && (
-        <div className="collaboration-panel">
-          <div className="panel-header">
-            <span>👥 Совместное рисование</span>
-            <span className="users-count">{activeUsers.length} участников</span>
-          </div>
-          <div className="panel-actions">
-            <button 
-              className="xp-button clear-btn"
-              onClick={sendClearCanvas}
-              title="Очистить холст для всех"
-            >
-              🧹 Очистить
-            </button>
-            <button 
-              className="xp-button fill-btn"
-              onClick={sendFillCanvas}
-              title="Залить холст для всех"
-            >
-              🎨 Залить
-            </button>
-            <button 
-              className="xp-button refresh-btn"
-              onClick={replayDrawingHistory}
-              title="Обновить рисунок"
-            >
-              🔄 Обновить
-            </button>
-          </div>
-        </div>
-      )}
+      {roomId && <RoomInfo roomId={roomId} />}
     </div>
   );
 });

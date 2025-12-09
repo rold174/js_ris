@@ -14,6 +14,7 @@ interface ToolbarProps {
   canUndo: boolean;
   canRedo: boolean;
   clearCanvas: () => void;
+  isInRoom?: boolean;
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({
@@ -24,6 +25,7 @@ const Toolbar: React.FC<ToolbarProps> = ({
   canUndo,
   canRedo,
   clearCanvas,
+  isInRoom = false
 }) => {
   const handleToolChange = (tool: string) => {
     setToolState({ ...toolState, tool });
@@ -39,6 +41,14 @@ const Toolbar: React.FC<ToolbarProps> = ({
 
   return (
     <div className="toolbar">
+      {/* Индикатор режима совместного рисования */}
+      {isInRoom && (
+        <div className="collaboration-indicator">
+          <span className="indicator-icon">👥</span>
+          <span className="indicator-text">Совместное рисование</span>
+        </div>
+      )}
+
       <ToolsSection
         toolState={toolState}
         onToolChange={handleToolChange}
@@ -61,6 +71,15 @@ const Toolbar: React.FC<ToolbarProps> = ({
         canUndo={canUndo}
         canRedo={canRedo}
       />
+
+      {/* Подсказка для режима совместного рисования */}
+      {isInRoom && (
+        <div className="room-tooltip">
+          <p className="tooltip-text">
+            Все изменения автоматически синхронизируются с другими участниками
+          </p>
+        </div>
+      )}
     </div>
   );
 };

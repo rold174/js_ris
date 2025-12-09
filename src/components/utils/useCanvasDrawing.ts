@@ -13,7 +13,6 @@ export const useCanvasDrawing = (
   const isDrawingRef = useRef(false);
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
 
-  // ЗАРАНЕЕ готовим функцию рисования
   const drawLine = useCallback((canvas: HTMLCanvasElement, x1: number, y1: number, x2: number, y2: number, color: string, lineWidth: number) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -34,23 +33,21 @@ export const useCanvasDrawing = (
 
     const point = getCanvasPoint(canvas, e.clientX, e.clientY);
 
-    if (toolState.tool === 'fill') {
-      floodFill(canvas, point.x, point.y, toolState.color);
-      saveToHistory(canvas.toDataURL());
-      setIsDrawing(false);
-      return;
-    }
-
     const color = toolState.tool === 'eraser' ? '#FFFFFF' : toolState.color;
     
     // Рисуем точку сразу
     drawLine(canvas, point.x, point.y, point.x, point.y, color, toolState.brushSize);
+    
+    // Если есть обработчик для совместного рисования, отправляем точку
+    if (onDraw) {
+      onDraw(point.x, point.y, point.x, point.y);
+    }
 
     lastPointRef.current = point;
     isDrawingRef.current = true;
     setIsDrawing(true);
 
-  }, [canvasRef, toolState, saveToHistory, setIsDrawing, drawLine]);
+  }, [canvasRef, toolState, setIsDrawing, drawLine, onDraw]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!isDrawingRef.current || !lastPointRef.current) return;
@@ -61,10 +58,10 @@ export const useCanvasDrawing = (
     const point = getCanvasPoint(canvas, e.clientX, e.clientY);
     const color = toolState.tool === 'eraser' ? '#FFFFFF' : toolState.color;
     
-    // РИСУЕМ СРАЗУ
+    // Рисуем линию
     drawLine(canvas, lastPointRef.current.x, lastPointRef.current.y, point.x, point.y, color, toolState.brushSize);
     
-    // ОТПРАВЛЯЕМ СРАЗУ
+    // Отправляем линию для совместного рисования
     if (onDraw) {
       onDraw(lastPointRef.current.x, lastPointRef.current.y, point.x, point.y);
     }

@@ -206,3 +206,109 @@
     min-width: 150px;
   }
 }
+
+/* Добавьте в конец Toolbar.css */
+
+/* Индикатор совместного рисования */
+.collaboration-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: linear-gradient(90deg, #0a246a 0%, #316ac5 100%);
+  color: white;
+  border: 1px outset #c0c0c0;
+  margin-bottom: 10px;
+  font-size: 11px;
+  border-radius: 2px;
+}
+
+.indicator-icon {
+  font-size: 14px;
+}
+
+.indicator-text {
+  flex: 1;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Подсказка для комнаты */
+.room-tooltip {
+  margin-top: 10px;
+  padding: 8px;
+  background: #f0f8ff;
+  border: 1px solid #000080;
+  border-radius: 2px;
+}
+
+.tooltip-text {
+  margin: 0;
+  font-size: 10px;
+  color: #000080;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Анимация пульсации для индикатора */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.collaboration-indicator {
+  animation: pulse 2s infinite;
+}
+
+/* Добавьте в конец Toolbar.css */
+
+/* Индикатор совместного рисования */
+.collaboration-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: linear-gradient(90deg, #0a246a 0%, #316ac5 100%);
+  color: white;
+  border: 1px outset #c0c0c0;
+  margin-bottom: 10px;
+  font-size: 11px;
+  border-radius: 2px;
+}
+
+.indicator-icon {
+  font-size: 14px;
+}
+
+.indicator-text {
+  flex: 1;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Подсказка для комнаты */
+.room-tooltip {
+  margin-top: 10px;
+  padding: 8px;
+  background: #f0f8ff;
+  border: 1px solid #000080;
+  border-radius: 2px;
+}
+
+.tooltip-text {
+  margin: 0;
+  font-size: 10px;
+  color: #000080;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Анимация пульсации для индикатора */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.collaboration-indicator {
+  animation: pulse 2s infinite;
+}

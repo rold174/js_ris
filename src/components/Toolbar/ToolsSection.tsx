@@ -45,6 +45,9 @@ const ToolsSection: React.FC<ToolsSectionProps> = ({
           🚮
         </button>
       </div>
+      {toolState.tool === 'fill' && (
+        <div className="tool-info">Кликните на холст для заливки области</div>
+      )}
     </div>
   );
 };
