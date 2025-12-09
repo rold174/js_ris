@@ -9,6 +9,7 @@ import {
   DrawingData 
 } from './firebaseRealtime';
 import { ToolState } from './ToolState';
+import { floodFill } from './FloodFill';
 
 interface UseSharedCanvasProps {
   roomId: string;
@@ -46,6 +47,9 @@ export const useSharedCanvas = ({
       ctx.stroke();
     } else if (type === 'clear') {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+    } else if (type === 'fill' && x !== undefined && y !== undefined) {
+      // Выполняем заливку
+      floodFill(canvas, x, y, color);
     }
   }, [canvasRef]);
 
@@ -148,10 +152,31 @@ export const useSharedCanvas = ({
     }
   }, [roomId, userId]);
 
+  // Отправка действия заливки
+  const sendFillCanvas = useCallback(async (x: number, y: number, color: string) => {
+    if (!roomId || !userId) return;
+    
+    const fillData: DrawingData = {
+      type: 'fill',
+      x,
+      y,
+      color,
+      brushSize: 0,
+      timestamp: Date.now(),
+      userId
+    };
+    
+    try {
+      await sendDrawingAction(roomId, fillData);
+    } catch (error) {
+      console.error('Ошибка при отправке заливки:', error);
+    }
+  }, [roomId, userId]);
+
   return {
     sendDrawing,
     sendClearCanvas,
-    sendFillCanvas: sendClearCanvas, // Простая заливка (очистка цветом)
+    sendFillCanvas,
     replayDrawingHistory
   };
 };

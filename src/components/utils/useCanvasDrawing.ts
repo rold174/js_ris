@@ -8,7 +8,8 @@ export const useCanvasDrawing = (
   toolState: ToolState,
   setIsDrawing: (drawing: boolean) => void,
   saveToHistory: (canvasData: string) => void,
-  onDraw?: (prevX: number, prevY: number, x: number, y: number) => void
+  onDraw?: (prevX: number, prevY: number, x: number, y: number) => void,
+  onFillCanvas?: (x: number, y: number, color: string) => void
 ) => {
   const isDrawingRef = useRef(false);
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
@@ -31,8 +32,26 @@ export const useCanvasDrawing = (
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const point = getCanvasPoint(canvas, e.clientX, e.clientY);
+    // Если инструмент - заливка, обрабатываем отдельно
+    if (toolState.tool === 'fill') {
+      const point = getCanvasPoint(canvas, e.clientX, e.clientY);
+      
+      // Выполняем заливку локально
+      floodFill(canvas, point.x, point.y, toolState.color);
+      
+      // Сохраняем в историю
+      saveToHistory(canvas.toDataURL());
+      
+      // Отправляем действие заливки для совместного рисования
+      if (onFillCanvas) {
+        onFillCanvas(point.x, point.y, toolState.color);
+      }
+      
+      return;
+    }
 
+    // Для остальных инструментов (кисть, ластик)
+    const point = getCanvasPoint(canvas, e.clientX, e.clientY);
     const color = toolState.tool === 'eraser' ? '#FFFFFF' : toolState.color;
     
     // Рисуем точку сразу
@@ -47,9 +66,11 @@ export const useCanvasDrawing = (
     isDrawingRef.current = true;
     setIsDrawing(true);
 
-  }, [canvasRef, toolState, setIsDrawing, drawLine, onDraw]);
+  }, [canvasRef, toolState, setIsDrawing, drawLine, onDraw, onFillCanvas, saveToHistory]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (toolState.tool === 'fill') return; // Для заливки не нужно обрабатывать движение
+    
     if (!isDrawingRef.current || !lastPointRef.current) return;
 
     const canvas = canvasRef.current;
@@ -71,6 +92,8 @@ export const useCanvasDrawing = (
   }, [canvasRef, toolState, onDraw, drawLine]);
 
   const stopDrawing = useCallback(() => {
+    if (toolState.tool === 'fill') return; // Для заливки не нужно останавливать рисование
+    
     if (isDrawingRef.current) {
       isDrawingRef.current = false;
       setIsDrawing(false);
@@ -81,7 +104,7 @@ export const useCanvasDrawing = (
       
       lastPointRef.current = null;
     }
-  }, [canvasRef, saveToHistory, setIsDrawing]);
+  }, [canvasRef, saveToHistory, setIsDrawing, toolState.tool]);
 
   return {
     startDrawing,

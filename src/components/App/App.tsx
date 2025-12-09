@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom'; // Добавьте этот импорт
+import { useSearchParams } from 'react-router-dom';
 import './App.css';
 import Canvas from '../Canvas/Canvas';
 import Toolbar from '../Toolbar/Toolbar';
@@ -7,11 +7,11 @@ import AppHeader from './AppHeader';
 import { ToolState } from '../utils/ToolState';
 import { useHistory } from '../utils/useHistory';
 import { useKeyboardShortcuts } from '../utils/useKeyboardShortcuts';
-import { useSharedCanvas } from '../utils/useSharedCanvas'; // Новый хук
+import { useSharedCanvas } from '../utils/useSharedCanvas';
 
 function App() {
-  const [searchParams] = useSearchParams(); // Получаем параметры URL
-  const roomId = searchParams.get('room'); // ID комнаты из URL
+  const [searchParams] = useSearchParams();
+  const roomId = searchParams.get('room');
   
   const [isDrawing, setIsDrawing] = useState(false);
   const [toolState, setToolState] = useState<ToolState>({
@@ -103,7 +103,7 @@ function App() {
           canUndo={canUndo}
           canRedo={canRedo}
           clearCanvas={clearCanvas}
-          isInRoom={!!roomId} // Передаем информацию о комнате
+          isInRoom={!!roomId}
         />
 
         <Canvas
@@ -112,7 +112,6 @@ function App() {
           setIsDrawing={setIsDrawing}
           toolState={toolState}
           saveToHistory={saveToHistory}
-          // Передаем функции для совместного рисования
           onDraw={sendDrawing}
           onClearCanvas={clearCanvas}
           onFillCanvas={sendFillCanvas}

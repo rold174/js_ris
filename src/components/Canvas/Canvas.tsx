@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
 import './Canvas.css';
 import { ToolState } from '../utils/ToolState';
 import RoomInfo from './RoomInfo';
@@ -11,7 +11,7 @@ interface CanvasProps {
   saveToHistory: (canvasData: string) => void;
   onDraw?: (prevX: number, prevY: number, x: number, y: number) => void;
   onClearCanvas?: () => void;
-  onFillCanvas?: () => void;
+  onFillCanvas?: (x: number, y: number, color: string) => void;
   roomId?: string;
   replayDrawingHistory?: () => void;
 }
@@ -35,7 +35,7 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({
     handleMouseMove,
     stopDrawing,
     isDrawingRef
-  } = useCanvasDrawing(canvasRef, toolState, setIsDrawing, saveToHistory, onDraw);
+  } = useCanvasDrawing(canvasRef, toolState, setIsDrawing, saveToHistory, onDraw, onFillCanvas);
 
   useImperativeHandle(ref, () => {
     if (!canvasRef.current) {
@@ -66,15 +66,6 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({
     }
   }, [roomId, replayDrawingHistory, saveToHistory]);
 
-  // Обработчик для инструмента заливки
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (toolState.tool === 'fill' && onFillCanvas) {
-      onFillCanvas();
-      return;
-    }
-    startDrawing(e);
-  };
-
   return (
     <div className="canvas-container">
       <canvas
@@ -82,10 +73,11 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({
         id="main-canvas"
         width={1600}
         height={600}
-        onMouseDown={handleMouseDown}
+        onMouseDown={startDrawing}
         onMouseMove={handleMouseMove}
         onMouseUp={stopDrawing}
         onMouseLeave={stopDrawing}
+        style={{ cursor: toolState.tool === 'fill' ? 'crosshair' : 'default' }}
       />
       
       {roomId && <RoomInfo roomId={roomId} />}
