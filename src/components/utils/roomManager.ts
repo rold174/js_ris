@@ -200,3 +200,22 @@ export const leaveRoom = async (roomId: string, userId: string): Promise<void> =
     console.error('Ошибка при выходе из комнаты:', error);
   }
 };
+
+// Добавьте в существующий файл roomManager.ts
+
+export const initializeRoomCanvas = async (roomId: string): Promise<void> => {
+  try {
+    const canvasRef = ref(database, `rooms/${roomId}/canvas`);
+    const snapshot = await get(canvasRef);
+    
+    if (!snapshot.exists()) {
+      await set(canvasRef, {
+        elements: {},
+        lastUpdated: Date.now(),
+        createdAt: Date.now()
+      });
+    }
+  } catch (error) {
+    console.error('Ошибка при инициализации холста комнаты:', error);
+  }
+};

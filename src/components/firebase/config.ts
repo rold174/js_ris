@@ -1,7 +1,7 @@
 // src/firebase/config.ts
 import { initializeApp } from "firebase/app";
 //import { getAnalytics } from "firebase/analytics";
-import { getDatabase, ref, push, get, query, orderByChild, equalTo, set, update, remove } from "firebase/database";
+import { getDatabase, ref, push, get, query, orderByChild, equalTo, set, update, remove, off, onValue } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAwmmg7sn1EUhMt5LanR3jZNJEPmL6qXDA",
@@ -19,6 +19,6 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 //const analytics = getAnalytics(app);
 
-export { database, ref, push, get, query, orderByChild, equalTo, set, update, remove };
+export { database, ref, push, get, query, orderByChild, equalTo, set, update, remove, off, onValue };
 
 

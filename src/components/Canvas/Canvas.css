@@ -194,3 +194,170 @@
   cursor: not-allowed;
   border: 2px outset #c0c0c0;
 }
+
+/* Добавьте в конец Canvas.css */
+
+/* Панель совместного рисования */
+.collaboration-panel {
+  background: linear-gradient(to bottom, #ece9d8 0%, #ffffff 100%);
+  border: 2px outset #c0c0c0;
+  border-radius: 0;
+  padding: 12px;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 16px;
+  font-family: "Nineteen Ninety Three", monospace;
+  font-size: 11px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #808080;
+  font-weight: bold;
+  color: #000080;
+}
+
+.users-count {
+  background: #000080;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+}
+
+.panel-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.panel-actions .xp-button {
+  background: linear-gradient(to bottom, #ece9d8 0%, #d4d0c8 100%);
+  color: #000000;
+  border: 2px outset #c0c0c0;
+  padding: 6px 12px;
+  border-radius: 0;
+  cursor: pointer;
+  font-size: 11px;
+  font-family: "Nineteen Ninety Three", monospace;
+}
+
+.panel-actions .xp-button:hover {
+  background: linear-gradient(to bottom, #f6f4e8 0%, #e8e4d8 100%);
+}
+
+.panel-actions .clear-btn {
+  border-color: #8b0000;
+}
+
+.panel-actions .fill-btn {
+  border-color: #006400;
+}
+
+.panel-actions .refresh-btn {
+  border-color: #000080;
+}
+
+/* Стили для списка участников */
+.room-info__participants {
+  background: #f8f8f8;
+  border: 1px inset #c0c0c0;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.participants-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+
+.participants-label {
+  font-weight: bold;
+  color: #000080;
+}
+
+.participants-count {
+  background: #000080;
+  color: white;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+}
+
+.participants-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.participant {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: white;
+  border: 1px solid #c0c0c0;
+  font-size: 10px;
+}
+
+.participant.current {
+  background: #f0f8ff;
+  border-color: #000080;
+}
+
+.participant-icon {
+  font-size: 12px;
+}
+
+.participant-id {
+  flex: 1;
+}
+
+/* Индикатор рисования в реальном времени */
+.realtime-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 128, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+/* Индикатор подключения */
+.connection-status {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  padding: 6px 12px;
+  border-radius: 3px;
+  font-size: 10px;
+  z-index: 1000;
+}
+
+.connection-status.connected {
+  background: rgba(0, 128, 0, 0.9);
+  color: white;
+}
+
+.connection-status.disconnected {
+  background: rgba(255, 0, 0, 0.9);
+  color: white;
+}
