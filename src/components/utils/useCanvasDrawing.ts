@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useCallback } from 'react';
 import { ToolState } from './ToolState';
 import { getCanvasPoint } from './DrawingTools';
 import { floodFill } from './FloodFill';
@@ -7,50 +7,28 @@ export const useCanvasDrawing = (
   canvasRef: React.RefObject<HTMLCanvasElement | null>,
   toolState: ToolState,
   setIsDrawing: (drawing: boolean) => void,
-  saveToHistory: (canvasData: string) => void
+  saveToHistory: (canvasData: string) => void,
+  onDraw?: (prevX: number, prevY: number, x: number, y: number) => void
 ) => {
+  const isDrawingRef = useRef(false);
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
-  const drawingRef = useRef(false);
 
-  const draw = (currentPoint: { x: number; y: number }) => {
-    const canvas = canvasRef.current;
-    if (!canvas || !drawingRef.current) return;
+  // ЗАРАНЕЕ готовим функцию рисования
+  const drawLine = useCallback((canvas: HTMLCanvasElement, x1: number, y1: number, x2: number, y2: number, color: string, lineWidth: number) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
-    ctx.strokeStyle = toolState.color;
-    ctx.lineWidth = toolState.brushSize;
+    
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
+    ctx.stroke();
+  }, []);
 
-    if (lastPointRef.current) {
-      ctx.beginPath();
-      ctx.moveTo(lastPointRef.current.x, lastPointRef.current.y);
-      ctx.lineTo(currentPoint.x, currentPoint.y);
-      ctx.stroke();
-    }
-    lastPointRef.current = currentPoint;
-  };
-
-  const erase = (currentPoint: { x: number; y: number }) => {
-    const canvas = canvasRef.current;
-    if (!canvas || !drawingRef.current) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.strokeStyle = '#FFFFFF';
-    ctx.lineWidth = toolState.brushSize;
-    ctx.lineCap = 'round';
-
-    if (lastPointRef.current) {
-      ctx.beginPath();
-      ctx.moveTo(lastPointRef.current.x, lastPointRef.current.y);
-      ctx.lineTo(currentPoint.x, currentPoint.y);
-      ctx.stroke();
-    }
-    lastPointRef.current = currentPoint;
-  };
-  const startDrawing = (e: React.MouseEvent) => {
+  const startDrawing = useCallback((e: React.MouseEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -60,41 +38,58 @@ export const useCanvasDrawing = (
       floodFill(canvas, point.x, point.y, toolState.color);
       saveToHistory(canvas.toDataURL());
       setIsDrawing(false);
-      drawingRef.current = false;
       return;
     }
 
-    lastPointRef.current = point;
-    setIsDrawing(true);
-    drawingRef.current = true;
-
-    if (toolState.tool === 'brush') {
-      draw(point);
-    }
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas || !drawingRef.current || toolState.tool === 'fill') return;
+    const color = toolState.tool === 'eraser' ? '#FFFFFF' : toolState.color;
     
-    const point = getCanvasPoint(canvas, e.clientX, e.clientY);
-    if (toolState.tool === 'brush') draw(point);
-    if (toolState.tool === 'eraser') erase(point);
-  };
+    // Рисуем точку сразу
+    drawLine(canvas, point.x, point.y, point.x, point.y, color, toolState.brushSize);
 
-  const stopDrawing = () => {
+    lastPointRef.current = point;
+    isDrawingRef.current = true;
+    setIsDrawing(true);
+
+  }, [canvasRef, toolState, saveToHistory, setIsDrawing, drawLine]);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isDrawingRef.current || !lastPointRef.current) return;
+
     const canvas = canvasRef.current;
-    if (drawingRef.current && toolState.tool !== 'fill' && canvas) {
-      setIsDrawing(false);
-      drawingRef.current = false;
-      lastPointRef.current = null;
-      saveToHistory(canvas.toDataURL());
+    if (!canvas) return;
+
+    const point = getCanvasPoint(canvas, e.clientX, e.clientY);
+    const color = toolState.tool === 'eraser' ? '#FFFFFF' : toolState.color;
+    
+    // РИСУЕМ СРАЗУ
+    drawLine(canvas, lastPointRef.current.x, lastPointRef.current.y, point.x, point.y, color, toolState.brushSize);
+    
+    // ОТПРАВЛЯЕМ СРАЗУ
+    if (onDraw) {
+      onDraw(lastPointRef.current.x, lastPointRef.current.y, point.x, point.y);
     }
-  };
+
+    lastPointRef.current = point;
+
+  }, [canvasRef, toolState, onDraw, drawLine]);
+
+  const stopDrawing = useCallback(() => {
+    if (isDrawingRef.current) {
+      isDrawingRef.current = false;
+      setIsDrawing(false);
+      
+      if (canvasRef.current) {
+        saveToHistory(canvasRef.current.toDataURL());
+      }
+      
+      lastPointRef.current = null;
+    }
+  }, [canvasRef, saveToHistory, setIsDrawing]);
 
   return {
     startDrawing,
     handleMouseMove,
-    stopDrawing
+    stopDrawing,
+    isDrawingRef
   };
 };

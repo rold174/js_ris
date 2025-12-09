@@ -23,6 +23,8 @@ export const useSharedCanvas = ({
   toolState,
   userId
 }: UseSharedCanvasProps) => {
+  const drawingBufferRef = useRef<Array<{prevX: number, prevY: number, x: number, y: number}>>([]);
+  const flushTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const drawingHistory = useRef<DrawingData[]>([]);
   const isDrawingRef = useRef(false);
   const lastSentRef = useRef<number>(0);
@@ -111,36 +113,56 @@ export const useSharedCanvas = ({
   }, [roomId, userId, replayDrawingHistory]);
 
   // Отправка действия рисования с дебаунсом
-  const sendDrawing = useCallback(async (
-    prevX: number,
-    prevY: number,
-    x: number,
-    y: number
-  ) => {
-    if (!roomId || !userId) return;
+  // Обновите функцию sendDrawing:
+const sendDrawing = useCallback(async (
+  prevX: number,
+  prevY: number,
+  x: number,
+  y: number
+) => {
+  if (!roomId || !userId) return;
+  
+  const drawingData: DrawingData = {
+    type: 'draw',
+    x,
+    y,
+    prevX,
+    prevY,
+    color: toolState.color,
+    brushSize: toolState.brushSize,
+    timestamp: Date.now(),
+    userId
+  };
+  
+  try {
+    // ОТПРАВЛЯЕМ БЕЗ ОЖИДАНИЯ - пусть отправляется в фоне
+    sendDrawingAction(roomId, drawingData).catch(error => {
+      console.error('Ошибка отправки:', error);
+    });
     
-    const now = Date.now();
-    
-    // Дебаунс: отправляем не чаще чем раз в 50мс
-    if (now - lastSentRef.current < 50) {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
-      
-      debounceTimeoutRef.current = setTimeout(() => {
-        sendDrawing(prevX, prevY, x, y);
-      }, 50);
-      return;
-    }
-    
-    lastSentRef.current = now;
-    
+    // Локально рисуем сразу
+    drawOnCanvas(drawingData);
+  } catch (error) {
+    console.error('Ошибка при отправке рисования:', error);
+  }
+}, [roomId, userId, toolState, drawOnCanvas]);
+
+const flushDrawingBuffer = useCallback(async () => {
+  if (drawingBufferRef.current.length === 0) return;
+  
+  const buffer = [...drawingBufferRef.current];
+  drawingBufferRef.current = [];
+  
+  const now = Date.now();
+  
+  // Отправляем все точки из буфера
+  for (const point of buffer) {
     const drawingData: DrawingData = {
       type: 'draw',
-      x,
-      y,
-      prevX,
-      prevY,
+      x: point.x,
+      y: point.y,
+      prevX: point.prevX,
+      prevY: point.prevY,
       color: toolState.color,
       brushSize: toolState.brushSize,
       timestamp: now,
@@ -149,12 +171,13 @@ export const useSharedCanvas = ({
     
     try {
       await sendDrawingAction(roomId, drawingData);
-      // Также рисуем локально
+      // Рисуем локально
       drawOnCanvas(drawingData);
     } catch (error) {
       console.error('Ошибка при отправке рисования:', error);
     }
-  }, [roomId, userId, toolState, drawOnCanvas]);
+  }
+}, [roomId, userId, toolState, drawOnCanvas]);
 
   // Отправка действия очистки
   const sendClearCanvas = useCallback(async () => {

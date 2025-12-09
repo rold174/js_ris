@@ -1,11 +1,12 @@
-import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import './Canvas.css';
 import { ToolState } from '../utils/ToolState';
 import RoomInfo from './RoomInfo';
 import { useSharedCanvas } from '../utils/useSharedCanvas';
 import { initializeRoomCanvas } from '../utils/roomManager';
-import { getUserId } from '../utils/firebaseRealtime'; // Добавим эту функцию
+import { getUserId } from '../utils/firebaseRealtime';
+import { useCanvasDrawing } from '../utils/useCanvasDrawing'; // Импортируем улучшенный хук
 
 interface CanvasProps {
   isDrawing: boolean;
@@ -25,8 +26,7 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({
   const [activeUsers, setActiveUsers] = useState<string[]>([]);
   
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const lastPointRef = useRef<{ x: number; y: number } | null>(null);
-  const userId = getUserId(); // Получаем ID пользователя
+  const userId = getUserId();
 
   const {
     sendDrawing,
@@ -40,85 +40,33 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({
     userId
   });
 
+  // Колбэк для отправки рисования
+const handleDraw = useCallback((prevX: number, prevY: number, x: number, y: number) => {
+  if (roomId) {
+    // ОТПРАВЛЯЕМ БЕЗ ДЕБАУНСА - пусть firebase сам разберется
+    sendDrawing(prevX, prevY, x, y);
+  }
+}, [roomId, sendDrawing]);
+
+  // Используем улучшенный хук для рисования
+  const {
+    startDrawing,
+    handleMouseMove,
+    stopDrawing
+  } = useCanvasDrawing(
+    canvasRef,
+    toolState,
+    setIsDrawing,
+    saveToHistory,
+    handleDraw // Передаем колбэк для синхронизации
+  );
+
   // Инициализация холста при загрузке
   useEffect(() => {
     if (roomId) {
       initializeRoomCanvas(roomId);
     }
   }, [roomId]);
-
-  // Получение координат мыши относительно холста
-  const getMousePos = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return { x: 0, y: 0 };
-    
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    
-    return {
-      x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top) * scaleY
-    };
-  };
-
-  // Начало рисования
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!roomId || !canvasRef.current) return;
-    
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    const { x, y } = getMousePos(e);
-    
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.strokeStyle = toolState.color;
-    ctx.lineWidth = toolState.brushSize;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    
-    lastPointRef.current = { x, y };
-    setIsDrawing(true);
-  };
-
-  // Рисование
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing || !lastPointRef.current || !roomId) return;
-    
-    const { x, y } = getMousePos(e);
-    
-    // Рисуем локально
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    if (ctx) {
-      ctx.lineTo(x, y);
-      ctx.stroke();
-    }
-    
-    // Отправляем действие другим пользователям
-    sendDrawing(lastPointRef.current.x, lastPointRef.current.y, x, y);
-    
-    // Обновляем последнюю точку
-    lastPointRef.current = { x, y };
-    
-    // Сохраняем в историю
-    if (canvas && Math.random() < 0.1) { // Сохраняем случайные снимки
-      saveToHistory(canvas.toDataURL());
-    }
-  };
-
-  // Окончание рисования
-  const stopDrawing = () => {
-    setIsDrawing(false);
-    lastPointRef.current = null;
-    
-    // Сохраняем окончательный результат
-    if (canvasRef.current) {
-      saveToHistory(canvasRef.current.toDataURL());
-    }
-  };
 
   useImperativeHandle(ref, () => {
     if (!canvasRef.current) {
@@ -127,23 +75,27 @@ const Canvas = forwardRef<HTMLCanvasElement, CanvasProps>(({
     return canvasRef.current;
   });
 
-  // Инициализация холста при загрузке
+  // Инициализация canvas context
+  // В Canvas.tsx в useEffect инициализации:
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    
-    // Загружаем существующие рисунки
-    setTimeout(() => {
-      replayDrawingHistory();
-    }, 100);
-
-  }, [replayDrawingHistory]);
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  
+  // Критически важные настройки для плавного рисования
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.globalCompositeOperation = 'source-over';
+  
+  // Начальные настройки
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 5;
+  
+  }, []);
 
   return (
     <div className="canvas-container">
