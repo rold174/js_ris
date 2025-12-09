@@ -179,3 +179,154 @@
 .start-window {
   animation: windowAppear 0.4s ease-out;
 }
+/* Добавьте в конец StartPage.css */
+.xp-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.room-input:disabled {
+  background: #f0f0f0;
+  cursor: not-allowed;
+}
+
+/* Добавьте в конец StartPage.css */
+
+/* Обновленные стили для окна */
+.window-subtitle {
+  font-size: 10px;
+  opacity: 0.8;
+  margin-left: auto;
+}
+
+.input-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.room-status {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.room-status.active {
+  background: #90ee90;
+  color: #006400;
+}
+
+.room-status.inactive {
+  background: #ffcccb;
+  color: #8b0000;
+}
+
+.input-with-button {
+  display: flex;
+  gap: 8px;
+}
+
+.copy-btn {
+  background: #ece9d8;
+  border: 1px outset #c0c0c0;
+  padding: 0 12px;
+  cursor: pointer;
+  font-size: 14px;
+  min-width: 40px;
+}
+
+.copy-btn:hover {
+  background: #f6f4e8;
+}
+
+.copy-btn:active {
+  border: 1px inset #c0c0c0;
+}
+
+.room-hint {
+  font-size: 10px;
+  color: #666;
+  margin-top: 5px;
+  font-style: italic;
+}
+
+/* Стили для недавних комнат */
+.recent-rooms {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed #ccc;
+}
+
+.recent-title {
+  font-size: 12px;
+  margin: 0 0 8px 0;
+  color: #000080;
+  font-weight: bold;
+}
+
+.room-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.room-chip {
+  background: #f0f0f0;
+  border: 1px solid #c0c0c0;
+  border-radius: 12px;
+  padding: 4px 10px;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.room-chip:hover {
+  background: #e0e8ff;
+  border-color: #000080;
+}
+
+.room-chip-id {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.room-chip-join {
+  font-weight: bold;
+  color: #000080;
+}
+
+/* Статистика в футере */
+.footer-stats {
+  font-size: 9px;
+  color: #999;
+  margin-top: 4px;
+}
+
+/* Состояния кнопок */
+.xp-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: linear-gradient(to bottom, #e8e4d8 0%, #d0ccc8 100%);
+}
+
+.xp-button:disabled:hover {
+  background: linear-gradient(to bottom, #e8e4d8 0%, #d0ccc8 100%);
+}
+
+.room-input:disabled {
+  background: #f8f8f8;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Подсказка при наведении на поле ввода */
+.room-input::placeholder {
+  color: #999;
+  font-size: 11px;
+}
